@@ -1,4 +1,5 @@
 import { Trash2, Plus, Minus, ShoppingBag, Receipt } from "lucide-react";
+import { computeTotals, formatTZS } from "./pos-data";
 
 export interface CartItem {
   id: string;
@@ -17,14 +18,8 @@ interface Props {
   onClear: () => void;
 }
 
-function formatTZS(amount: number) {
-  return "TZS " + amount.toLocaleString("en-TZ");
-}
-
 export function CartPanel({ items, onIncrement, onDecrement, onRemove, onCheckout, onClear }: Props) {
-  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
-  const tax = Math.round(subtotal * 0.18);
-  const total = subtotal + tax;
+  const { subtotal, tax, total } = computeTotals(items);
   const count = items.reduce((s, i) => s + i.qty, 0);
 
   return (

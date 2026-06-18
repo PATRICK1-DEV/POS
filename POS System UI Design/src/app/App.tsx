@@ -3,30 +3,31 @@ import {
   LayoutGrid, History, BarChart2, Settings, ChevronRight,
   AlertCircle, ShoppingCart, Store, Menu, X
 } from "lucide-react";
-import { products, categories, findByBarcode } from "./components/pos-data";
-import type { Product } from "./components/pos-data";
+import { products as initialProducts, categories, findByBarcode, computeTotals, formatTZS } from "./components/pos-data";
+import type { Product, Sale } from "./components/pos-data";
 import { ScannerInput } from "./components/ScannerInput";
 import { CartPanel } from "./components/CartPanel";
 import type { CartItem } from "./components/CartPanel";
 import { CheckoutModal } from "./components/CheckoutModal";
+import { HistoryView } from "./components/HistoryView";
+import { ReportsView } from "./components/ReportsView";
+import { SettingsView } from "./components/SettingsView";
 
 {/* MARKER-MAKE-KIT-INVOKED */}
 
-function formatTZS(n: number) {
-  return "TZS " + n.toLocaleString("en-TZ");
-}
-
 const NAV_ITEMS = [
-  { id: "pos", icon: LayoutGrid, label: "Duka" },
-  { id: "history", icon: History, label: "Historia" },
-  { id: "reports", icon: BarChart2, label: "Ripoti" },
-  { id: "settings", icon: Settings, label: "Mipango" },
+  { id: "pos", icon: LayoutGrid, label: "Duka", title: "Uuzaji wa Bidhaa" },
+  { id: "history", icon: History, label: "Historia", title: "Historia ya Mauzo" },
+  { id: "reports", icon: BarChart2, label: "Ripoti", title: "Ripoti" },
+  { id: "settings", icon: Settings, label: "Mipango", title: "Mipango" },
 ];
 
 export default function App() {
   const [activeNav, setActiveNav] = useState("pos");
   const [selectedCat, setSelectedCat] = useState("Zote");
+  const [productList, setProductList] = useState<Product[]>(initialProducts);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [sales, setSales] = useState<Sale[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: "ok" | "err" } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -37,6 +38,11 @@ export default function App() {
   }, []);
 
   function addToCart(product: Product) {
+    const inCart = cart.find(i => i.id === product.id)?.qty ?? 0;
+    if (inCart >= product.stock) {
+      showToast(`${product.emoji} ${product.name} imeisha stoo`, "err");
+      return;
+    }
     setCart(prev => {
       const existing = prev.find(i => i.id === product.id);
       if (existing) {
@@ -57,6 +63,12 @@ export default function App() {
   }
 
   function increment(id: string) {
+    const product = productList.find(p => p.id === id);
+    const inCart = cart.find(i => i.id === id)?.qty ?? 0;
+    if (product && inCart >= product.stock) {
+      showToast(`${product.emoji} ${product.name} imeisha stoo`, "err");
+      return;
+    }
     setCart(prev => prev.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i));
   }
 
@@ -73,15 +85,31 @@ export default function App() {
     setCart(prev => prev.filter(i => i.id !== id));
   }
 
-  function handleCheckoutComplete() {
+  function handleCheckoutComplete(method: string) {
+    const { subtotal, tax, total } = computeTotals(cart);
+    const sale: Sale = {
+      id: `s${Date.now()}`,
+      at: Date.now(),
+      items: cart.map(i => ({ ...i })),
+      subtotal,
+      tax,
+      total,
+      method,
+    };
+    setSales(prev => [sale, ...prev]);
+    setProductList(prev => prev.map(p => {
+      const sold = cart.find(i => i.id === p.id);
+      return sold ? { ...p, stock: Math.max(0, p.stock - sold.qty) } : p;
+    }));
     setCart([]);
     setShowCheckout(false);
     showToast("✅ Muamala umekamilika!");
   }
 
-  const filtered = selectedCat === "Zote" ? products : products.filter(p => p.category === selectedCat);
+  const filtered = selectedCat === "Zote" ? productList : productList.filter(p => p.category === selectedCat);
   const cartCount = cart.reduce((s, i) => s + i.qty, 0);
-  const cartTotal = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const cartTotal = computeTotals(cart).total;
+  const activeItem = NAV_ITEMS.find(n => n.id === activeNav) ?? NAV_ITEMS[0];
 
   return (
     <div className="size-full flex bg-background overflow-hidden" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
@@ -167,107 +195,125 @@ export default function App() {
             <Menu size={20} />
           </button>
           <div>
-            <h1 className="text-foreground leading-none" style={{ fontWeight: 700 }}>Uuzaji wa Bidhaa</h1>
+            <h1 className="text-foreground leading-none" style={{ fontWeight: 700 }}>{activeItem.title}</h1>
             <p className="text-xs text-muted-foreground mt-0.5">Juni 16, 2026 — Duka la Amina, Dar es Salaam</p>
           </div>
           {/* mobile cart button */}
-          <button
-            className="ml-auto lg:hidden relative p-2.5 rounded-xl bg-primary text-primary-foreground"
-            onClick={() => setShowCheckout(cart.length > 0 ? true : false)}
-          >
-            <ShoppingCart size={18} />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center" style={{ fontWeight: 700 }}>
-                {cartCount}
-              </span>
-            )}
-          </button>
+          {activeNav === "pos" && (
+            <button
+              className="ml-auto lg:hidden relative p-2.5 rounded-xl bg-primary text-primary-foreground"
+              onClick={() => setShowCheckout(cart.length > 0 ? true : false)}
+            >
+              <ShoppingCart size={18} />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center" style={{ fontWeight: 700 }}>
+                  {cartCount}
+                </span>
+              )}
+            </button>
+          )}
         </header>
 
         {/* Body */}
         <div className="flex-1 flex overflow-hidden">
 
-          {/* Products area */}
-          <div className="flex-1 flex flex-col overflow-hidden px-4 sm:px-6 py-4 gap-4">
+          {activeNav === "pos" ? (
+            <>
+              {/* Products area */}
+              <div className="flex-1 flex flex-col overflow-hidden px-4 sm:px-6 py-4 gap-4">
 
-            {/* Scanner */}
-            <ScannerInput onScan={handleScan} />
+                {/* Scanner */}
+                <ScannerInput onScan={handleScan} />
 
-            {/* Category filter */}
-            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCat(cat)}
-                  className={`
-                    flex-shrink-0 px-4 py-2 rounded-xl text-sm transition-all
-                    ${selectedCat === cat
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-card border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                    }
-                  `}
-                  style={{ fontWeight: 600 }}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+                {/* Category filter */}
+                <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                  {categories.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCat(cat)}
+                      className={`
+                        flex-shrink-0 px-4 py-2 rounded-xl text-sm transition-all
+                        ${selectedCat === cat
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "bg-card border border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                        }
+                      `}
+                      style={{ fontWeight: 600 }}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
 
-            {/* Product grid */}
-            <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pb-4">
-                {filtered.map(product => (
-                  <button
-                    key={product.id}
-                    onClick={() => addToCart(product)}
-                    className="group text-left p-4 rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-md active:scale-[0.97] transition-all"
-                  >
-                    <div className="text-3xl mb-3 leading-none">{product.emoji}</div>
-                    <p className="text-sm text-foreground leading-snug mb-1 line-clamp-2" style={{ fontWeight: 600 }}>{product.name}</p>
-                    <p className="text-primary" style={{ fontWeight: 700, fontSize: "0.8rem" }}>{formatTZS(product.price)}</p>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-muted-foreground">Stoo: {product.stock}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground" style={{ fontWeight: 500 }}>
-                        {product.category}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Mobile checkout bar */}
-            {cart.length > 0 && (
-              <div className="lg:hidden pb-2">
-                <button
-                  onClick={() => setShowCheckout(true)}
-                  className="w-full py-4 rounded-2xl bg-primary text-primary-foreground flex items-center justify-between px-5 shadow-lg"
-                  style={{ fontWeight: 700 }}
-                >
-                  <div className="flex items-center gap-2">
-                    <ShoppingCart size={18} />
-                    <span>{cartCount} bidhaa</span>
+                {/* Product grid */}
+                <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pb-4">
+                    {filtered.map(product => {
+                      const soldOut = product.stock <= 0;
+                      return (
+                        <button
+                          key={product.id}
+                          onClick={() => addToCart(product)}
+                          disabled={soldOut}
+                          className="group text-left p-4 rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-md active:scale-[0.97] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                        >
+                          <div className="text-3xl mb-3 leading-none">{product.emoji}</div>
+                          <p className="text-sm text-foreground leading-snug mb-1 line-clamp-2" style={{ fontWeight: 600 }}>{product.name}</p>
+                          <p className="text-primary" style={{ fontWeight: 700, fontSize: "0.8rem" }}>{formatTZS(product.price)}</p>
+                          <div className="flex items-center justify-between mt-2">
+                            <span className={`text-xs ${soldOut ? "text-destructive" : "text-muted-foreground"}`}>
+                              {soldOut ? "Imeisha" : `Stoo: ${product.stock}`}
+                            </span>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground" style={{ fontWeight: 500 }}>
+                              {product.category}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span>{formatTZS(cartTotal)}</span>
-                    <ChevronRight size={18} />
-                  </div>
-                </button>
-              </div>
-            )}
-          </div>
+                </div>
 
-          {/* Cart — desktop */}
-          <div className="hidden lg:flex w-80 xl:w-96 flex-shrink-0 p-4">
-            <CartPanel
-              items={cart}
-              onIncrement={increment}
-              onDecrement={decrement}
-              onRemove={remove}
-              onCheckout={() => setShowCheckout(true)}
-              onClear={() => setCart([])}
-            />
-          </div>
+                {/* Mobile checkout bar */}
+                {cart.length > 0 && (
+                  <div className="lg:hidden pb-2">
+                    <button
+                      onClick={() => setShowCheckout(true)}
+                      className="w-full py-4 rounded-2xl bg-primary text-primary-foreground flex items-center justify-between px-5 shadow-lg"
+                      style={{ fontWeight: 700 }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ShoppingCart size={18} />
+                        <span>{cartCount} bidhaa</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span>{formatTZS(cartTotal)}</span>
+                        <ChevronRight size={18} />
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Cart — desktop */}
+              <div className="hidden lg:flex w-80 xl:w-96 flex-shrink-0 p-4">
+                <CartPanel
+                  items={cart}
+                  onIncrement={increment}
+                  onDecrement={decrement}
+                  onRemove={remove}
+                  onCheckout={() => setShowCheckout(true)}
+                  onClear={() => setCart([])}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col overflow-hidden px-4 sm:px-6 py-4">
+              {activeNav === "history" && <HistoryView sales={sales} />}
+              {activeNav === "reports" && <ReportsView sales={sales} products={productList} />}
+              {activeNav === "settings" && <SettingsView />}
+            </div>
+          )}
         </div>
       </div>
 

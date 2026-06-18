@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { X, Banknote, Smartphone, CreditCard, CheckCircle2 } from "lucide-react";
 import { CartItem } from "./CartPanel";
+import { computeTotals, formatTZS } from "./pos-data";
 
 interface Props {
   items: CartItem[];
   onClose: () => void;
-  onComplete: () => void;
-}
-
-function formatTZS(n: number) {
-  return "TZS " + n.toLocaleString("en-TZ");
+  onComplete: (method: string) => void;
 }
 
 const PAYMENT_METHODS = [
@@ -24,15 +21,13 @@ export function CheckoutModal({ items, onClose, onComplete }: Props) {
   const [cashGiven, setCashGiven] = useState("");
   const [done, setDone] = useState(false);
 
-  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
-  const tax = Math.round(subtotal * 0.18);
-  const total = subtotal + tax;
+  const { total } = computeTotals(items);
   const change = method === "cash" && cashGiven ? Math.max(0, Number(cashGiven) - total) : 0;
 
   function handlePay() {
     setDone(true);
     setTimeout(() => {
-      onComplete();
+      onComplete(method);
     }, 2200);
   }
 
@@ -111,7 +106,7 @@ export function CheckoutModal({ items, onClose, onComplete }: Props) {
                     </div>
                   )}
                   {cashGiven && Number(cashGiven) < total && (
-                    <p className="text-destructive text-xs px-1">Pesa haitoshi — inabidi TZS {formatTZS(total - Number(cashGiven))} zaidi.</p>
+                    <p className="text-destructive text-xs px-1">Pesa haitoshi — inabidi {formatTZS(total - Number(cashGiven))} zaidi.</p>
                   )}
                 </div>
               )}
