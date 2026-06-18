@@ -32,3 +32,46 @@ export const categories = ["Zote", "Chakula", "Usafi", "Vinywaji", "Elektroniki"
 export function findByBarcode(code: string): Product | undefined {
   return products.find(p => p.barcode === code || p.id === code);
 }
+
+export const VAT_RATE = 0.18;
+
+export function formatTZS(amount: number): string {
+  return "TZS " + amount.toLocaleString("en-TZ");
+}
+
+export interface Totals {
+  subtotal: number;
+  tax: number;
+  total: number;
+}
+
+export function computeTotals(items: { price: number; qty: number }[]): Totals {
+  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const tax = Math.round(subtotal * VAT_RATE);
+  return { subtotal, tax, total: subtotal + tax };
+}
+
+export interface SaleLine {
+  id: string;
+  name: string;
+  price: number;
+  qty: number;
+  emoji: string;
+}
+
+export interface Sale {
+  id: string;
+  at: number;
+  items: SaleLine[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  method: string;
+}
+
+export const PAYMENT_LABELS: Record<string, string> = {
+  cash: "Pesa Taslimu",
+  mpesa: "M-Pesa",
+  tigopesa: "Tigo Pesa",
+  card: "Kadi ya Benki",
+};
