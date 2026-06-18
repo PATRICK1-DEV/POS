@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import {
   LayoutGrid, History, BarChart2, Settings, ChevronRight,
-  AlertCircle, ShoppingCart, Store, Menu, X
+  AlertCircle, ShoppingCart, Store, Menu, X, LogOut
 } from "lucide-react";
 import { products as initialProducts, categories, findByBarcode, computeTotals, formatTZS } from "./components/pos-data";
 import type { Product, Sale } from "./components/pos-data";
@@ -12,6 +12,9 @@ import { CheckoutModal } from "./components/CheckoutModal";
 import { HistoryView } from "./components/HistoryView";
 import { ReportsView } from "./components/ReportsView";
 import { SettingsView } from "./components/SettingsView";
+import { AuthScreen } from "./components/AuthScreen";
+import { getSession, logout, initials } from "./components/auth";
+import type { Session } from "./components/auth";
 
 {/* MARKER-MAKE-KIT-INVOKED */}
 
@@ -23,6 +26,7 @@ const NAV_ITEMS = [
 ];
 
 export default function App() {
+  const [session, setSession] = useState<Session | null>(() => getSession());
   const [activeNav, setActiveNav] = useState("pos");
   const [selectedCat, setSelectedCat] = useState("Zote");
   const [productList, setProductList] = useState<Product[]>(initialProducts);
@@ -111,6 +115,17 @@ export default function App() {
   const cartTotal = computeTotals(cart).total;
   const activeItem = NAV_ITEMS.find(n => n.id === activeNav) ?? NAV_ITEMS[0];
 
+  function handleLogout() {
+    logout();
+    setSession(null);
+    setSidebarOpen(false);
+    setActiveNav("pos");
+  }
+
+  if (!session) {
+    return <AuthScreen onAuthenticated={setSession} />;
+  }
+
   return (
     <div className="size-full flex bg-background overflow-hidden" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
 
@@ -170,16 +185,23 @@ export default function App() {
         </nav>
 
         {/* Cashier */}
-        <div className="px-3 pb-4">
+        <div className="px-3 pb-4 space-y-1">
           <div className="flex items-center gap-3 sm:justify-center px-3 py-3 rounded-xl bg-sidebar-accent">
             <div className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center flex-shrink-0 text-sm" style={{ fontWeight: 700, color: "var(--sidebar-primary)" }}>
-              AM
+              {initials(session.name)}
             </div>
             <div className="sm:hidden min-w-0">
-              <p className="text-sidebar-foreground text-sm truncate" style={{ fontWeight: 600 }}>Amina Mwangi</p>
+              <p className="text-sidebar-foreground text-sm truncate" style={{ fontWeight: 600 }}>{session.name}</p>
               <p className="text-xs text-sidebar-foreground/50">Cashier</p>
             </div>
           </div>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 sm:justify-center px-3 py-2.5 rounded-xl text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+          >
+            <LogOut size={18} />
+            <span className="sm:hidden text-sm" style={{ fontWeight: 600 }}>Toka</span>
+          </button>
         </div>
       </aside>
 
@@ -311,7 +333,7 @@ export default function App() {
             <div className="flex-1 flex flex-col overflow-hidden px-4 sm:px-6 py-4">
               {activeNav === "history" && <HistoryView sales={sales} />}
               {activeNav === "reports" && <ReportsView sales={sales} products={productList} />}
-              {activeNav === "settings" && <SettingsView />}
+              {activeNav === "settings" && <SettingsView cashierName={session.name} />}
             </div>
           )}
         </div>

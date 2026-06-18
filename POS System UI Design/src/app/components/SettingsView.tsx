@@ -1,14 +1,18 @@
 import { Store, User, Percent, MapPin } from "lucide-react";
 import { VAT_RATE } from "./pos-data";
 
-const SETTINGS = [
-  { label: "Jina la Duka", value: "Duka la Amina", icon: Store },
-  { label: "Mahali", value: "Dar es Salaam, Tanzania", icon: MapPin },
-  { label: "Cashier", value: "Amina Mwangi", icon: User },
-  { label: "Kiwango cha VAT", value: `${Math.round(VAT_RATE * 100)}%`, icon: Percent },
-];
+interface Props {
+  cashierName: string;
+}
 
-export function SettingsView() {
+export function SettingsView({ cashierName }: Props) {
+  const SETTINGS = [
+    { label: "Jina la Duka", value: "Duka la Amina", icon: Store },
+    { label: "Mahali", value: "Dar es Salaam, Tanzania", icon: MapPin },
+    { label: "Cashier", value: cashierName, icon: User },
+    { label: "Kiwango cha VAT", value: `${Math.round(VAT_RATE * 100)}%`, icon: Percent },
+  ];
+
   return (
     <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
       <div className="max-w-xl space-y-3 pb-4">
