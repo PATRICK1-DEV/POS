@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { X, Banknote, Smartphone, CreditCard, CheckCircle2 } from "lucide-react";
+import { X, Banknote, Smartphone, CreditCard, CheckCircle2, Minus, Plus } from "lucide-react";
 import { CartItem } from "./CartPanel";
 
 interface Props {
   items: CartItem[];
   onClose: () => void;
   onComplete: () => void;
+  onUpdateQty: (id: string, delta: number) => void;
 }
 
 function formatTZS(n: number) {
@@ -19,7 +20,7 @@ const PAYMENT_METHODS = [
   { id: "card", label: "Kadi ya Benki", icon: CreditCard, color: "bg-purple-50 text-purple-700 border-purple-200" },
 ];
 
-export function CheckoutModal({ items, onClose, onComplete }: Props) {
+export function CheckoutModal({ items, onClose, onComplete, onUpdateQty }: Props) {
   const [method, setMethod] = useState("cash");
   const [cashGiven, setCashGiven] = useState("");
   const [done, setDone] = useState(false);
@@ -59,8 +60,29 @@ export function CheckoutModal({ items, onClose, onComplete }: Props) {
               {/* order summary */}
               <div className="bg-secondary/60 rounded-xl p-4 space-y-1.5">
                 {items.map(item => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">{item.emoji} {item.name} ×{item.qty}</span>
+                  <div key={item.id} className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-muted-foreground">{item.emoji} {item.name}</span>
+                      <div className="flex items-center gap-0.5 bg-background rounded-lg border border-border">
+                        <button
+                          type="button"
+                          onClick={() => onUpdateQty(item.id, -1)}
+                          className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-l-lg"
+                        >
+                          <Minus size={10} />
+                        </button>
+                        <span className="w-6 text-center text-xs text-foreground" style={{ fontWeight: 600 }}>
+                          {item.qty}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => onUpdateQty(item.id, 1)}
+                          className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground rounded-r-lg"
+                        >
+                          <Plus size={10} />
+                        </button>
+                      </div>
+                    </div>
                     <span className="text-foreground" style={{ fontWeight: 500 }}>{formatTZS(item.price * item.qty)}</span>
                   </div>
                 ))}

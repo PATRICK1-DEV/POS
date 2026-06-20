@@ -634,6 +634,9 @@ export default function POSPage() {
           items={cart}
           onClose={() => setShowCheckout(false)}
           onComplete={handleCheckoutComplete}
+          onUpdateQty={(id, delta) =>
+            delta > 0 ? increment(id) : decrement(id)
+          }
         />
       )}
 
