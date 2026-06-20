@@ -81,7 +81,7 @@ export default function AdminDashboardPage() {
 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<any | null>(null);
-  const [form, setForm] = useState({ name: "", emoji: "📦", category: "General", price: 0, image_url: "" });
+  const [form, setForm] = useState({ name: "", emoji: "📦", category: "General", image_url: "" });
   const [imageUploading, setImageUploading] = useState(false);
 
   const [showUserForm, setShowUserForm] = useState(false);
@@ -90,19 +90,19 @@ export default function AdminDashboardPage() {
 
   function openCreate() {
     setEditing(null);
-    setForm({ name: "", emoji: "📦", category: "General", price: 0, image_url: "" });
+    setForm({ name: "", emoji: "📦", category: "General", image_url: "" });
     setShowForm(true);
   }
 
   function openEdit(p: any) {
     setEditing(p);
-    setForm({ name: p.name, emoji: p.emoji, category: p.category, price: p.price, image_url: p.image_url ?? "" });
+    setForm({ name: p.name, emoji: p.emoji, category: p.category, image_url: p.image_url ?? "" });
     setShowForm(true);
   }
 
   async function handleSave() {
-    if (!form.name || form.price <= 0) return;
-    const payload = { name: form.name, emoji: form.emoji, category: form.category, price: form.price, image_url: form.image_url || undefined };
+    if (!form.name) return;
+    const payload = { name: form.name, emoji: form.emoji, category: form.category, price: 0, image_url: form.image_url || undefined };
     if (editing) {
       await updateGlobalProduct(editing.id, payload);
     } else {
@@ -565,19 +565,9 @@ export default function AdminDashboardPage() {
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
-              <div>
-                <label className="block text-sm text-foreground mb-1.5" style={{ fontWeight: 600 }}>Bei (TZS)</label>
-                <input
-                  type="number"
-                  value={form.price}
-                  onChange={e => setForm({ ...form, price: Math.max(0, Number(e.target.value)) })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring text-foreground text-sm"
-                  placeholder="0"
-                />
-              </div>
               <button
                 onClick={handleSave}
-                disabled={!form.name || form.price <= 0}
+                disabled={!form.name}
                 className="w-full py-3 rounded-xl bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 style={{ fontWeight: 700 }}
               >
