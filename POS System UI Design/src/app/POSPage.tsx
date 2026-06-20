@@ -111,9 +111,7 @@ export default function POSPage() {
   }
 
   const displayProducts = shop
-    ? shopProducts
-        .filter((sp) => sp.stock > 0)
-        .map((sp) => ({
+    ? shopProducts.map((sp) => ({
           id: sp.product_id,
           name: sp.product.name,
           price: sp.selling_price ?? sp.price,
@@ -425,7 +423,7 @@ export default function POSPage() {
                           <button
                             key={product.id}
                             onClick={() => addToCart(product)}
-                            className="group text-left p-4 rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-md active:scale-[0.97] transition-all"
+                            className={`group text-left p-4 rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-md active:scale-[0.97] transition-all ${product.stock === 0 ? "opacity-50" : ""}`}
                           >
                             {product.image_url ? (
                               <img src={product.image_url} alt="" className="w-12 h-12 mb-3 object-contain mx-auto" />
@@ -437,9 +435,13 @@ export default function POSPage() {
                             {shop && (
                               <div className="flex items-center justify-between mt-2">
                                 <span className="text-xs text-muted-foreground">Stoo: {product.stock}</span>
-                                <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground" style={{ fontWeight: 500 }}>
-                                  {product.category}
-                                </span>
+                                {product.stock === 0 ? (
+                                  <span className="text-xs px-2 py-0.5 rounded-full bg-destructive/10 text-destructive" style={{ fontWeight: 500 }}>Imeisha</span>
+                                ) : (
+                                  <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground" style={{ fontWeight: 500 }}>
+                                    {product.category}
+                                  </span>
+                                )}
                               </div>
                             )}
                           </button>
