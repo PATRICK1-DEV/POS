@@ -68,7 +68,7 @@ export default function AdminDashboardPage() {
 
   const stats = [
     { icon: Users, label: "Watumiaji", value: profiles.length, color: "text-blue-500" },
-    { icon: Store, label: "Maduka", value: shops.length, color: "text-emerald-500" },
+    { icon: Store, label: "Maduka", value: shops.filter(s => profiles.find(p => p.user_id === s.owner_id)).length, color: "text-emerald-500" },
     { icon: Package, label: "Bidhaa", value: products.length, color: "text-amber-500" },
     { icon: ShoppingCart, label: "Mauzo", value: orders.length, color: "text-violet-500" },
   ];
@@ -235,7 +235,7 @@ export default function AdminDashboardPage() {
               {tab === "overview" ? "Muhtasari" : tab === "users" ? "Watumiaji" : tab === "shops" ? "Maduka" : "Bidhaa"}
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
-              {tab === "overview" ? "Admin dashboard" : tab === "users" ? `${profiles.length} watumiaji` : tab === "shops" ? `${shops.length} maduka` : `${products.length} bidhaa`}
+              {tab === "overview" ? "Admin dashboard" : tab === "users" ? `${profiles.length} watumiaji` : tab === "shops" ? `${(shops.filter(s => profiles.find(p => p.user_id === s.owner_id))).length} maduka` : `${products.length} bidhaa`}
             </p>
           </div>
         </header>
@@ -357,8 +357,10 @@ export default function AdminDashboardPage() {
           {/* Shops */}
           {tab === "shops" && (
             <div className="max-w-3xl mx-auto space-y-3">
-              {shops.length > 0 ? (
-                shops.map((s) => (
+              {(() => {
+                const validShops = shops.filter(s => profiles.find(p => p.user_id === s.owner_id));
+                return validShops.length > 0 ? (
+                validShops.map((s) => (
                   <div key={s.id} className="bg-card border border-border rounded-2xl p-4">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
@@ -383,7 +385,7 @@ export default function AdminDashboardPage() {
                   <Store size={32} />
                   <p className="text-sm">Hakuna maduka bado</p>
                 </div>
-              )}
+              )}})()}
             </div>
           )}
 
