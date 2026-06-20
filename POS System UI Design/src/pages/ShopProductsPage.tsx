@@ -254,7 +254,6 @@ export default function ShopProductsPage({ shop }: Props) {
                     <p className="text-foreground text-sm" style={{ fontWeight: 600 }}>{p.name}</p>
                     <p className="text-xs text-muted-foreground">{p.category}</p>
                   </div>
-                  </span>
                   <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
                     <Plus size={14} className="text-primary" />
                   </div>
