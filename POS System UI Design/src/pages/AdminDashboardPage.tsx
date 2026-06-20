@@ -385,7 +385,7 @@ export default function AdminDashboardPage() {
                   <Store size={32} />
                   <p className="text-sm">Hakuna maduka bado</p>
                 </div>
-              )}})()}
+              )})()}
             </div>
           )}
 
