@@ -33,7 +33,7 @@ const NAV_ITEMS = [
 
 interface ShopProductItem {
   product_id: string;
-  product: { id: string; name: string; emoji: string; category: string; price: number; };
+  product: { id: string; name: string; emoji: string; category: string; price: number; image_url?: string; };
   selling_price: number;
   buying_price: number;
   stock: number;
@@ -118,6 +118,7 @@ export default function POSPage() {
           name: sp.product.name,
           price: sp.selling_price ?? sp.price,
           emoji: sp.product.emoji,
+          image_url: sp.product.image_url,
           stock: sp.stock,
           category: sp.product.category,
         }))
@@ -426,7 +427,11 @@ export default function POSPage() {
                             onClick={() => addToCart(product)}
                             className="group text-left p-4 rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-md active:scale-[0.97] transition-all"
                           >
-                            <div className="text-3xl mb-3 leading-none">{product.emoji}</div>
+                            {product.image_url ? (
+                              <img src={product.image_url} alt="" className="w-12 h-12 mb-3 object-contain mx-auto" />
+                            ) : (
+                              <div className="text-3xl mb-3 leading-none">{product.emoji}</div>
+                            )}
                             <p className="text-sm text-foreground leading-snug mb-1 line-clamp-2" style={{ fontWeight: 600 }}>{product.name}</p>
                             <p className="text-primary" style={{ fontWeight: 700, fontSize: "0.8rem" }}>{formatTZS(product.price)}</p>
                             {shop && (

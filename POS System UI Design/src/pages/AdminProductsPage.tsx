@@ -6,6 +6,7 @@ import {
   createGlobalProduct,
   updateGlobalProduct,
   deleteGlobalProduct,
+  uploadProductImage,
 } from "../lib/db";
 
 interface Product {
@@ -14,6 +15,7 @@ interface Product {
   emoji: string;
   category: string;
   price: number;
+  image_url?: string;
 }
 
 const CATEGORIES = ["Mboga", "Mkate", "Vitafunio", "Vinywaji", "Usafi", "General"];
@@ -24,7 +26,8 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
-  const [form, setForm] = useState({ name: "", emoji: "", category: "General", price: 0 });
+  const [form, setForm] = useState({ name: "", emoji: "", category: "General", price: 0, image_url: "" });
+  const [imageUploading, setImageUploading] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -37,26 +40,36 @@ export default function AdminProductsPage() {
 
   function openCreate() {
     setEditing(null);
-    setForm({ name: "", emoji: "📦", category: "General", price: 0 });
+    setForm({ name: "", emoji: "📦", category: "General", price: 0, image_url: "" });
     setShowForm(true);
   }
 
   function openEdit(p: Product) {
     setEditing(p);
-    setForm({ name: p.name, emoji: p.emoji, category: p.category, price: p.price });
+    setForm({ name: p.name, emoji: p.emoji, category: p.category, price: p.price, image_url: p.image_url ?? "" });
     setShowForm(true);
   }
 
   async function handleSave() {
     if (!form.name || form.price <= 0) return;
+    const payload = { name: form.name, emoji: form.emoji, category: form.category, price: form.price, image_url: form.image_url || undefined };
     if (editing) {
-      await updateGlobalProduct(editing.id, form);
+      await updateGlobalProduct(editing.id, payload);
     } else {
-      await createGlobalProduct(form);
+      await createGlobalProduct(payload);
     }
     setShowForm(false);
     setEditing(null);
     load();
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageUploading(true);
+    const url = await uploadProductImage(file);
+    if (url) setForm({ ...form, image_url: url });
+    setImageUploading(false);
   }
 
   async function handleDelete(id: string) {
@@ -109,7 +122,11 @@ export default function AdminProductsPage() {
                 key={p.id}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border"
               >
-                <span className="text-2xl">{p.emoji}</span>
+                {p.image_url ? (
+                  <img src={p.image_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                ) : (
+                  <span className="text-2xl">{p.emoji}</span>
+                )}
                 <div className="flex-1 min-w-0">
                   <p className="text-foreground text-sm" style={{ fontWeight: 600 }}>{p.name}</p>
                   <p className="text-xs text-muted-foreground">{p.category}</p>
@@ -152,13 +169,36 @@ export default function AdminProductsPage() {
             </div>
             <div className="px-6 py-5 space-y-4">
               <div>
-                <label className="block text-sm text-foreground mb-1.5" style={{ fontWeight: 600 }}>Emoji</label>
-                <input
-                  value={form.emoji}
-                  onChange={e => setForm({ ...form, emoji: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring text-foreground text-sm"
-                  placeholder="📦"
-                />
+                <label className="block text-sm text-foreground mb-1.5" style={{ fontWeight: 600 }}>Picha</label>
+                <div className="flex items-center gap-3">
+                  {form.image_url ? (
+                    <img src={form.image_url} alt="" className="w-16 h-16 rounded-xl object-cover border border-border" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-xl bg-input-background border border-border flex items-center justify-center text-2xl">
+                      {form.emoji}
+                    </div>
+                  )}
+                  <label className="flex-1 cursor-pointer">
+                    <div className="w-full px-4 py-2.5 rounded-xl bg-input-background border border-border hover:border-primary/40 text-muted-foreground text-sm text-center transition-colors">
+                      {imageUploading ? "Inapakia..." : form.image_url ? "Badilisha picha" : "Chagua picha"}
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  {form.image_url && (
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, image_url: "" })}
+                      className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      <X size={16} />
+                    </button>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="block text-sm text-foreground mb-1.5" style={{ fontWeight: 600 }}>Jina</label>

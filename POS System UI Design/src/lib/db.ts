@@ -34,6 +34,7 @@ export async function createGlobalProduct(product: {
   emoji: string;
   category: string;
   price: number;
+  image_url?: string;
 }) {
   const { data: user } = await supabase.auth.getUser();
   if (!user.user) return null;
@@ -47,7 +48,7 @@ export async function createGlobalProduct(product: {
 
 export async function updateGlobalProduct(
   id: string,
-  product: { name: string; emoji: string; category: string; price: number }
+  product: { name: string; emoji: string; category: string; price: number; image_url?: string }
 ) {
   const { data } = await supabase
     .from("products")
@@ -263,4 +264,25 @@ export async function deleteUserCascade(userId: string) {
     target_user_id: userId,
   });
   if (error) console.error("deleteUserCascade error:", error);
+}
+
+// --- Images ---
+
+export async function uploadProductImage(file: File): Promise<string | null> {
+  const ext = file.name.split(".").pop() ?? "png";
+  const filePath = `products/${crypto.randomUUID()}.${ext}`;
+  const { data, error } = await supabase.storage
+    .from("product-images")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+  if (error) {
+    console.error("uploadProductImage error:", error);
+    return null;
+  }
+  const { data: urlData } = supabase.storage
+    .from("product-images")
+    .getPublicUrl(data.path);
+  return urlData.publicUrl;
 }
