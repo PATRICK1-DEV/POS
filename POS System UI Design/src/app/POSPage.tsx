@@ -381,7 +381,7 @@ export default function POSPage() {
                   </div>
                 )}
 
-                {(!shop || shopProducts.length > 0) && (
+                {(shop && shopProducts.length > 0) && (
                   <>
                     <SearchInput value={searchQuery} onChange={setSearchQuery} />
 
