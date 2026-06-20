@@ -32,6 +32,8 @@ interface ShopProductItem {
   id: string;
   product_id: string;
   price: number;
+  selling_price: number;
+  buying_price: number;
   stock: number;
   product: GlobalProduct;
 }
@@ -62,26 +64,38 @@ export default function ShopProductsPage({ shop }: Props) {
   );
 
   async function handleAdd(productId: string, price: number) {
-    await addShopProduct(shop.id, productId, price, 0);
+    await addShopProduct(shop.id, productId, price, 0, 0);
     await load();
     setShowAddModal(false);
   }
 
   async function handleRemove(id: string) {
     await deleteShopProduct(id);
-    load();
+    setShopProducts(prev => prev.filter(sp => sp.id !== id));
   }
 
   async function handleStockChange(id: string, stock: number) {
     if (stock < 0) stock = 0;
+    setShopProducts(prev => prev.map(sp =>
+      sp.id === id ? { ...sp, stock } : sp
+    ));
     await updateShopProduct(id, { stock });
-    load();
   }
 
-  async function handlePriceChange(id: string, price: number) {
-    if (price < 0) price = 0;
-    await updateShopProduct(id, { price });
-    load();
+  async function handleSellingPriceChange(id: string, sellingPrice: number) {
+    if (sellingPrice < 0) sellingPrice = 0;
+    setShopProducts(prev => prev.map(sp =>
+      sp.id === id ? { ...sp, selling_price: sellingPrice, price: sellingPrice } : sp
+    ));
+    await updateShopProduct(id, { selling_price: sellingPrice });
+  }
+
+  async function handleBuyingPriceChange(id: string, buyingPrice: number) {
+    if (buyingPrice < 0) buyingPrice = 0;
+    setShopProducts(prev => prev.map(sp =>
+      sp.id === id ? { ...sp, buying_price: buyingPrice } : sp
+    ));
+    await updateShopProduct(id, { buying_price: buyingPrice });
   }
 
   return (
@@ -146,21 +160,33 @@ export default function ShopProductsPage({ shop }: Props) {
                   </p>
                   <p className="text-xs text-muted-foreground">{sp.product.category}</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
+                <div className="flex items-start gap-2">
+                  <div className="text-right space-y-1.5">
                     <div className="flex items-center gap-1">
-                      <span className="text-xs text-muted-foreground">Bei:</span>
+                      <span className="text-xs text-muted-foreground">Kuuza:</span>
                       <input
                         type="number"
-                        value={sp.price}
+                        value={sp.selling_price ?? sp.price}
                         onChange={(e) =>
-                          handlePriceChange(sp.id, Number(e.target.value))
+                          handleSellingPriceChange(sp.id, Number(e.target.value))
                         }
                         className="w-20 px-2 py-1 rounded-lg bg-input-background border border-border text-xs text-foreground text-right"
                         style={{ fontWeight: 600 }}
                       />
                     </div>
-                    <div className="flex items-center gap-1 mt-1">
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs text-muted-foreground">Kununua:</span>
+                      <input
+                        type="number"
+                        value={sp.buying_price}
+                        onChange={(e) =>
+                          handleBuyingPriceChange(sp.id, Number(e.target.value))
+                        }
+                        className="w-20 px-2 py-1 rounded-lg bg-input-background border border-border text-xs text-foreground text-right"
+                        style={{ fontWeight: 600 }}
+                      />
+                    </div>
+                    <div className="flex items-center gap-1">
                       <span className="text-xs text-muted-foreground">Stoo:</span>
                       <div className="flex items-center gap-0.5">
                         <button

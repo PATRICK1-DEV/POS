@@ -100,12 +100,20 @@ export async function getShopProducts(shopId: string) {
 export async function addShopProduct(
   shopId: string,
   productId: string,
-  price: number,
-  stock: number
+  sellingPrice: number,
+  stock: number,
+  buyingPrice: number = 0
 ) {
   const { data } = await supabase
     .from("shop_products")
-    .insert({ shop_id: shopId, product_id: productId, price, stock })
+    .insert({
+      shop_id: shopId,
+      product_id: productId,
+      price: sellingPrice,
+      selling_price: sellingPrice,
+      buying_price: buyingPrice,
+      stock,
+    })
     .select()
     .single();
   return data;
@@ -113,11 +121,21 @@ export async function addShopProduct(
 
 export async function updateShopProduct(
   id: string,
-  updates: { price?: number; stock?: number; is_active?: boolean }
+  updates: { selling_price?: number; buying_price?: number; stock?: number; is_active?: boolean }
 ) {
+  const dbUpdates: Record<string, any> = {};
+  if (updates.selling_price !== undefined) {
+    dbUpdates.selling_price = updates.selling_price;
+    dbUpdates.price = updates.selling_price;
+  }
+  if (updates.buying_price !== undefined) {
+    dbUpdates.buying_price = updates.buying_price;
+  }
+  if (updates.stock !== undefined) dbUpdates.stock = updates.stock;
+  if (updates.is_active !== undefined) dbUpdates.is_active = updates.is_active;
   const { data } = await supabase
     .from("shop_products")
-    .update(updates)
+    .update(dbUpdates)
     .eq("id", id)
     .select()
     .single();

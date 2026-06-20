@@ -33,7 +33,8 @@ const NAV_ITEMS = [
 interface ShopProductItem {
   product_id: string;
   product: { id: string; name: string; emoji: string; category: string; price: number; };
-  price: number;
+  selling_price: number;
+  buying_price: number;
   stock: number;
 }
 
@@ -114,7 +115,7 @@ export default function POSPage() {
         .map((sp) => ({
           id: sp.product_id,
           name: sp.product.name,
-          price: sp.price,
+          price: sp.selling_price ?? sp.price,
           emoji: sp.product.emoji,
           stock: sp.stock,
           category: sp.product.category,
