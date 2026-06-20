@@ -155,7 +155,7 @@ export default function ShopProductsPage({ shop }: Props) {
                 className="flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border"
               >
                 {sp.product.image_url ? (
-                  <img src={sp.product.image_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                  <img src={sp.product.image_url} alt="" className="w-8 h-8 rounded-lg object-contain bg-input-background" />
                 ) : (
                   <span className="text-2xl">{sp.product.emoji}</span>
                 )}
@@ -246,7 +246,7 @@ export default function ShopProductsPage({ shop }: Props) {
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border hover:border-primary/50 transition-all text-left"
                 >
                   {p.image_url ? (
-                    <img src={p.image_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                    <img src={p.image_url} alt="" className="w-8 h-8 rounded-lg object-contain bg-input-background" />
                   ) : (
                     <span className="text-2xl">{p.emoji}</span>
                   )}

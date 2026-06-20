@@ -123,7 +123,7 @@ export default function AdminProductsPage() {
                 className="flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border"
               >
                 {p.image_url ? (
-                  <img src={p.image_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                  <img src={p.image_url} alt="" className="w-8 h-8 rounded-lg object-contain bg-input-background" />
                 ) : (
                   <span className="text-2xl">{p.emoji}</span>
                 )}
@@ -172,7 +172,7 @@ export default function AdminProductsPage() {
                 <label className="block text-sm text-foreground mb-1.5" style={{ fontWeight: 600 }}>Picha</label>
                 <div className="flex items-center gap-3">
                   {form.image_url ? (
-                    <img src={form.image_url} alt="" className="w-16 h-16 rounded-xl object-cover border border-border" />
+                    <img src={form.image_url} alt="" className="w-16 h-16 rounded-xl object-contain border border-border bg-input-background" />
                   ) : (
                     <div className="w-16 h-16 rounded-xl bg-input-background border border-border flex items-center justify-center text-2xl">
                       {form.emoji}

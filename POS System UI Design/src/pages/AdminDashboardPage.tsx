@@ -518,7 +518,7 @@ export default function AdminDashboardPage() {
                 <label className="block text-sm text-foreground mb-1.5" style={{ fontWeight: 600 }}>Picha</label>
                 <div className="flex items-center gap-3">
                   {form.image_url ? (
-                    <img src={form.image_url} alt="" className="w-16 h-16 rounded-xl object-cover border border-border" />
+                    <img src={form.image_url} alt="" className="w-16 h-16 rounded-xl object-contain border border-border bg-input-background" />
                   ) : (
                     <div className="w-16 h-16 rounded-xl bg-input-background border border-border flex items-center justify-center text-2xl">
                       {form.emoji}
