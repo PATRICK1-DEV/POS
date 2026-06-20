@@ -53,8 +53,8 @@ export default function RegisterPage() {
 
   if (success) {
     return (
-      <div className="size-full flex items-center justify-center bg-background p-4">
-        <div className="w-full max-w-sm bg-card border border-border rounded-2xl p-8 text-center space-y-4">
+      <div className="min-h-dvh min-h-screen flex items-center justify-center bg-background px-4 py-4">
+        <div className="w-full max-w-sm bg-card border border-border rounded-2xl p-6 md:p-8 text-center space-y-4">
           <div className="w-16 h-16 rounded-full bg-accent/15 flex items-center justify-center mx-auto">
             <CheckCircle2 size={36} className="text-accent" />
           </div>
@@ -69,26 +69,26 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="size-full flex items-center justify-center bg-background p-4 relative overflow-hidden">
+    <div className="min-h-dvh min-h-screen flex items-center justify-center bg-background px-4 py-4 relative overflow-y-auto">
       {/* Decorative background */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="fixed inset-0 pointer-events-none">
         <div className="absolute -top-20 -right-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
       </div>
 
       <div className="w-full max-w-sm relative">
         {/* Logo & Branding */}
-        <div className="flex flex-col items-center gap-4 mb-10">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/25 flex items-center justify-center p-3">
+        <div className="flex flex-col items-center gap-3 mb-6">
+          <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/25 flex items-center justify-center p-2.5 md:p-3">
             <img src="/logo2.jpeg" alt="" className="w-full h-full object-contain drop-shadow-sm" />
           </div>
           <div className="text-center">
-            <h1 className="text-foreground text-2xl tracking-tight" style={{ fontWeight: 800 }}>MANGi APP</h1>
-            <p className="text-muted-foreground text-sm mt-1">Unda akaunti mpya</p>
+            <h1 className="text-foreground text-xl md:text-2xl tracking-tight" style={{ fontWeight: 800 }}>MANGi APP</h1>
+            <p className="text-muted-foreground text-xs md:text-sm mt-0.5">Unda akaunti mpya</p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-card border border-border/60 shadow-xl shadow-black/5 rounded-2xl p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="bg-card border border-border/60 shadow-xl shadow-black/5 rounded-2xl p-4 md:p-6 space-y-4 md:space-y-5">
           <div className="space-y-1.5">
             <label className="block text-sm text-foreground" style={{ fontWeight: 600 }}>
               Jina la mtumiaji
@@ -101,7 +101,7 @@ export default function RegisterPage() {
                 onChange={e => setUsername(e.target.value)}
                 placeholder="mfano123"
                 required
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-primary/40 text-foreground placeholder:text-muted-foreground text-sm transition-all"
+                className="w-full pl-10 pr-4 py-2.5 md:py-3 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-primary/40 text-foreground placeholder:text-muted-foreground text-sm transition-all"
               />
             </div>
           </div>
@@ -118,7 +118,7 @@ export default function RegisterPage() {
                 onChange={e => setPhone(e.target.value)}
                 placeholder="+255 7XX XXX XXX"
                 required
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-primary/40 text-foreground placeholder:text-muted-foreground text-sm transition-all"
+                className="w-full pl-10 pr-4 py-2.5 md:py-3 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-primary/40 text-foreground placeholder:text-muted-foreground text-sm transition-all"
               />
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function RegisterPage() {
                 placeholder="Angalau herufi 6"
                 required
                 minLength={6}
-                className="w-full px-4 py-3 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-primary/40 text-foreground placeholder:text-muted-foreground text-sm pr-10 transition-all"
+                className="w-full px-4 py-2.5 md:py-3 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-primary/40 text-foreground placeholder:text-muted-foreground text-sm pr-10 transition-all"
               />
               <button
                 type="button"
@@ -157,7 +157,7 @@ export default function RegisterPage() {
               onChange={e => setConfirm(e.target.value)}
               placeholder="Andika nywila tena"
               required
-              className="w-full px-4 py-3 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-primary/40 text-foreground placeholder:text-muted-foreground text-sm transition-all"
+              className="w-full px-4 py-2.5 md:py-3 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-primary/40 text-foreground placeholder:text-muted-foreground text-sm transition-all"
             />
           </div>
 
@@ -171,7 +171,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
+            className="w-full py-2.5 md:py-3 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
             style={{ fontWeight: 700 }}
           >
             {loading && <Loader2 size={16} className="animate-spin" />}
