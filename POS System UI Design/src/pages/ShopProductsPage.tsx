@@ -26,6 +26,7 @@ interface GlobalProduct {
   emoji: string;
   category: string;
   price: number;
+  image_url?: string;
 }
 
 interface ShopProductItem {
@@ -153,7 +154,11 @@ export default function ShopProductsPage({ shop }: Props) {
                 key={sp.id}
                 className="flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border"
               >
-                <span className="text-2xl">{sp.product.emoji}</span>
+                {sp.product.image_url ? (
+                  <img src={sp.product.image_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                ) : (
+                  <span className="text-2xl">{sp.product.emoji}</span>
+                )}
                 <div className="flex-1 min-w-0">
                   <p className="text-foreground text-sm" style={{ fontWeight: 600 }}>
                     {sp.product.name}
@@ -240,13 +245,15 @@ export default function ShopProductsPage({ shop }: Props) {
                   onClick={() => handleAdd(p.id, p.price)}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border hover:border-primary/50 transition-all text-left"
                 >
-                  <span className="text-2xl">{p.emoji}</span>
+                  {p.image_url ? (
+                    <img src={p.image_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
+                  ) : (
+                    <span className="text-2xl">{p.emoji}</span>
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground text-sm" style={{ fontWeight: 600 }}>{p.name}</p>
                     <p className="text-xs text-muted-foreground">{p.category}</p>
                   </div>
-                  <span className="text-sm text-primary" style={{ fontWeight: 700 }}>
-                    TZS {p.price.toLocaleString()}
                   </span>
                   <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
                     <Plus size={14} className="text-primary" />
