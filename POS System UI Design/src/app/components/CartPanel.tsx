@@ -55,7 +55,7 @@ export function CartPanel({ items, onIncrement, onDecrement, onRemove, onCheckou
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 text-muted-foreground py-12">
             <ShoppingBag size={40} strokeWidth={1.2} />
-            <p className="text-sm text-center">Kikapu ni tupu.<br />Scan bidhaa kuanza.</p>
+            <p className="text-sm text-center">Kikapu ni tupu.<br />Chagua bidhaa kuanza.</p>
           </div>
         ) : (
           items.map(item => (
