@@ -17,6 +17,7 @@ import {
   createShop,
   getShopOrders,
   getOrdersByDateRange,
+  updateShopProduct,
 } from "../lib/db";
 
 function formatTZS(n: number) {
@@ -204,6 +205,18 @@ export default function POSPage() {
           price: i.price,
         })),
       });
+      for (const item of cart) {
+        const sp = shopProducts.find((p) => p.product_id === item.id);
+        if (sp) {
+          const newStock = Math.max(0, sp.stock - item.qty);
+          await updateShopProduct(sp.id, { stock: newStock });
+          setShopProducts((prev) =>
+            prev.map((p) =>
+              p.id === sp.id ? { ...p, stock: newStock } : p
+            )
+          );
+        }
+      }
     }
     setCart([]);
     setShowCheckout(false);

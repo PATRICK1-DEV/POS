@@ -44,7 +44,6 @@ export function CheckoutModal({ items, onClose, onComplete, onUpdateQty }: Props
               <CheckCircle2 size={44} className="text-accent" />
             </div>
             <h2 className="text-foreground" style={{ fontWeight: 700 }}>Malipo Yamefanikiwa!</h2>
-            <p className="text-muted-foreground text-sm">Asante kwa kununua. Karibuni tena!</p>
             <p className="text-primary" style={{ fontWeight: 700 }}>{formatTZS(total)}</p>
           </div>
         ) : (
