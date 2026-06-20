@@ -12,6 +12,7 @@ import {
   updateUserRole,
   updateUserProfile,
   deleteUserProfile,
+  deleteUserCascade,
   getGlobalProducts,
   createGlobalProduct,
   updateGlobalProduct,
@@ -125,7 +126,7 @@ export default function AdminDashboardPage() {
 
   async function handleDeleteUser(userId: string, username: string) {
     if (!confirm(`Una uhakika unataka kumfuta "${username}"?`)) return;
-    await deleteUserProfile(userId);
+    await deleteUserCascade(userId);
     load();
   }
 
@@ -366,7 +367,9 @@ export default function AdminDashboardPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-foreground text-sm" style={{ fontWeight: 600 }}>{s.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {s.owner_id ? "Mmiliki: akaunti" : "—"}
+                        {s.owner_id
+                          ? `Mmiliki: ${profiles.find(p => p.user_id === s.owner_id)?.username ?? profiles.find(p => p.user_id === s.owner_id)?.email ?? "akaunti"}`
+                          : "—"}
                       </p>
                       </div>
                       <div className="text-right text-xs text-muted-foreground">

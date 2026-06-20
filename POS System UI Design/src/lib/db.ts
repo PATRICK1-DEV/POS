@@ -257,3 +257,10 @@ export async function updateUserProfile(
 export async function deleteUserProfile(userId: string) {
   await supabase.from("profiles").delete().eq("user_id", userId);
 }
+
+export async function deleteUserCascade(userId: string) {
+  const { error } = await supabase.rpc("delete_user_cascade", {
+    target_user_id: userId,
+  });
+  if (error) console.error("deleteUserCascade error:", error);
+}
