@@ -24,9 +24,7 @@ export function CheckoutModal({ items, onClose, onComplete }: Props) {
   const [cashGiven, setCashGiven] = useState("");
   const [done, setDone] = useState(false);
 
-  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
-  const tax = Math.round(subtotal * 0.18);
-  const total = subtotal + tax;
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
   const change = method === "cash" && cashGiven ? Math.max(0, Number(cashGiven) - total) : 0;
 
   function handlePay() {
