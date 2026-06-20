@@ -66,11 +66,16 @@ export default function AdminDashboardPage() {
       )
     : profiles;
 
+  const validOwnerIds = new Set(profiles.map(p => p.user_id));
+  const validShopIds = new Set(shops.filter(s => validOwnerIds.has(s.owner_id)).map(s => s.id));
+  const validOrders = orders.filter(o => validShopIds.has(o.shop_id));
+  const validProducts = products.filter(p => validOwnerIds.has(p.created_by));
+
   const stats = [
     { icon: Users, label: "Watumiaji", value: profiles.length, color: "text-blue-500" },
-    { icon: Store, label: "Maduka", value: shops.filter(s => profiles.find(p => p.user_id === s.owner_id)).length, color: "text-emerald-500" },
-    { icon: Package, label: "Bidhaa", value: products.length, color: "text-amber-500" },
-    { icon: ShoppingCart, label: "Mauzo", value: orders.length, color: "text-violet-500" },
+    { icon: Store, label: "Maduka", value: validShopIds.size, color: "text-emerald-500" },
+    { icon: Package, label: "Bidhaa", value: validProducts.length, color: "text-amber-500" },
+    { icon: ShoppingCart, label: "Mauzo", value: validOrders.length, color: "text-violet-500" },
   ];
 
   const [showForm, setShowForm] = useState(false);
@@ -256,11 +261,11 @@ export default function AdminDashboardPage() {
 
               <div className="bg-card border border-border rounded-2xl p-4">
                 <h2 className="text-foreground text-sm mb-3" style={{ fontWeight: 600 }}>Mauzo ya Hivi Karibuni</h2>
-                {orders.length === 0 ? (
+                {validOrders.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Hakuna mauzo bado</p>
                 ) : (
                   <div className="space-y-2">
-                    {orders.slice(0, 5).map((o) => (
+                    {validOrders.slice(0, 5).map((o) => (
                       <div key={o.id} className="flex items-center justify-between text-sm">
                         <div>
                           <span className="text-foreground">Mauzo</span>
