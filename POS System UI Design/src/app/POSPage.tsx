@@ -255,9 +255,9 @@ export default function POSPage() {
   }
 
   return (
-    <div className="size-full flex flex-col bg-background overflow-hidden" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
+    <div className="size-full bg-background overflow-hidden" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 sm:px-6 py-4 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0 relative z-10">
+      <header className="fixed top-0 left-0 right-0 flex items-center gap-3 px-4 sm:px-6 py-4 border-b border-border bg-card/80 backdrop-blur-sm z-10">
         <div className="flex items-center gap-2.5">
           <img src="/logo2.jpeg" alt="MANGi" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
           <div className="hidden sm:block">
@@ -327,11 +327,11 @@ export default function POSPage() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 flex overflow-hidden pb-[68px]">
-        <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="h-full flex overflow-y-auto pt-[68px] pb-[68px]">
+        <div className="flex-1 flex flex-col">
           {activeNav === "pos" ? (
             <>
-              <div className="flex-1 flex flex-col overflow-hidden px-4 sm:px-6 py-4 gap-4">
+              <div className="flex flex-col px-4 sm:px-6 py-4 gap-4">
                 {!shop && (
                   <div className="bg-accent/10 rounded-2xl p-5 flex items-center justify-between">
                     <div>
@@ -385,7 +385,7 @@ export default function POSPage() {
                       ))}
                     </div>
 
-                    <div className="flex-1 overflow-y-auto pb-4" style={{ scrollbarWidth: "none" }}>
+                    <div className="pb-4">
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {filtered.map((product) => (
                           <div
@@ -450,7 +450,7 @@ export default function POSPage() {
               </div>
             </>
           ) : activeNav === "history" ? (
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
+            <div className="px-4 sm:px-6 py-4">
               <h2 className="text-foreground text-lg mb-4" style={{ fontWeight: 700 }}>Historia ya Mauzo</h2>
               {ordersLoading ? (
                 <div className="flex items-center justify-center py-20">
@@ -499,7 +499,7 @@ export default function POSPage() {
               )}
             </div>
           ) : activeNav === "reports" ? (
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
+            <div className="px-4 sm:px-6 py-4">
               <h2 className="text-foreground text-lg mb-4" style={{ fontWeight: 700 }}>Ripoti za Mauzo</h2>
               {ordersLoading ? (
                 <div className="flex items-center justify-center py-20">
@@ -565,7 +565,7 @@ export default function POSPage() {
               )}
             </div>
           ) : (
-            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4">
+            <div className="px-4 sm:px-6 py-4">
               <h2 className="text-foreground text-lg mb-4" style={{ fontWeight: 700 }}>Pakia bidhaa</h2>
               <div className="max-w-md mx-auto space-y-4">
                 <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
