@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   LayoutGrid, History, BarChart2, Settings, ChevronRight,
-  AlertCircle, ShoppingCart, Menu, X, Package, Loader2, Shield
+  AlertCircle, ShoppingCart, Package, Loader2, Shield, Plus, LogOut, X
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import { products as fallbackProducts, categories as fallbackCategories } from "./components/pos-data";
@@ -55,7 +55,6 @@ export default function POSPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: "ok" | "err" } | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showShopForm, setShowShopForm] = useState(false);
   const [shopName, setShopName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -166,6 +165,15 @@ export default function POSPage() {
     showToast(`${product.emoji} ${product.name} imeongezwa`);
   }
 
+  function sellDirect(product: (typeof displayProducts)[number]) {
+    if (product.stock < 1) {
+      showToast("Bidhaa imeisha!", "err");
+      return;
+    }
+    setCart([{ id: product.id, name: product.name, price: product.price, qty: 1, emoji: product.emoji }]);
+    setShowCheckout(true);
+  }
+
   function increment(id: string) {
     setCart((prev) => {
       const item = prev.find((i) => i.id === id);
@@ -234,133 +242,52 @@ export default function POSPage() {
   }
 
   return (
-    <div className="size-full flex bg-background overflow-hidden" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-foreground/40 sm:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`
-          fixed sm:relative z-40 sm:z-auto
-          flex flex-col w-64 sm:w-20 h-full
-          bg-sidebar text-sidebar-foreground
-          transition-transform duration-300
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"}
-        `}
-      >
-        <div className="flex items-center gap-3 px-5 py-5 border-b border-sidebar-border">
-          <img src="/logo2.jpeg" alt="MANGi" className="w-9 h-9 rounded-xl object-cover flex-shrink-0" />
-          <div className="sm:hidden">
-            <p className="text-sidebar-foreground leading-none" style={{ fontWeight: 700 }}>MANGi APP</p>
-            <p className="text-xs text-sidebar-foreground/50 mt-0.5">Point of Sale</p>
+    <div className="size-full flex flex-col bg-background overflow-hidden" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
+      {/* Header */}
+      <header className="flex items-center gap-3 px-4 sm:px-6 py-4 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
+        <div className="flex items-center gap-2.5">
+          <img src="/logo2.jpeg" alt="MANGi" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
+          <div className="hidden sm:block">
+            <p className="text-xs text-muted-foreground">{shop?.name ?? "MANGi POS"}</p>
           </div>
-          <button
-            className="ml-auto sm:hidden text-sidebar-foreground/60 hover:text-sidebar-foreground"
-            onClick={() => setSidebarOpen(false)}
-          >
-            <X size={18} />
-          </button>
         </div>
-
-        <nav className="flex flex-col gap-1 px-3 py-4 flex-1">
-          {NAV_ITEMS.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => { setActiveNav(item.id); setSidebarOpen(false); }}
-              className={`
-                flex items-center gap-3 sm:justify-center px-3 py-3 rounded-xl transition-colors
-                ${activeNav === item.id
-                  ? "bg-primary text-primary-foreground"
-                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                }
-              `}
-            >
-              <item.icon size={20} />
-              <span className="sm:hidden text-sm" style={{ fontWeight: 600 }}>{item.label}</span>
-            </button>
-          ))}
-        </nav>
-
-        <div className="px-3 pb-4 space-y-1">
-          {isAdmin && (
-            <button
-              onClick={() => navigate("/admin")}
-              className="w-full flex items-center gap-3 sm:justify-center px-3 py-3 rounded-xl text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
-            >
-              <Shield size={20} />
-              <span className="sm:hidden text-sm" style={{ fontWeight: 600 }}>Admin</span>
-            </button>
-          )}
-          <div className="flex items-center gap-3 sm:justify-center px-3 py-3 rounded-xl bg-sidebar-accent">
-            <div className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center flex-shrink-0 text-sm" style={{ fontWeight: 700, color: "var(--sidebar-primary)" }}>
-              {profile?.username?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? "U"}
-            </div>
-            <div className="sm:hidden min-w-0">
-              <p className="text-sidebar-foreground text-sm truncate" style={{ fontWeight: 600 }}>{profile?.username ?? user?.email ?? "User"}</p>
+        <div className="flex-1 text-center sm:text-left">
+          <h1 className="text-foreground leading-none text-sm sm:text-base" style={{ fontWeight: 700 }}>
+            {activeNav === "pos" ? (shop ? shop.name : "Uuzaji wa Bidhaa")
+              : activeNav === "history" ? "Historia"
+              : activeNav === "reports" ? "Ripoti"
+              : "Mipango"}
+          </h1>
+          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">
+            {activeNav === "pos" && shop ? `${shopProducts.length} bidhaa stookini`
+              : activeNav === "pos" ? "Mode ya majaribio"
+              : activeNav === "history" ? "Mauzo yaliyopita"
+              : activeNav === "reports" ? "Muhtasari wa mauzo"
+              : "Mipango ya akaunti"}
+          </p>
+        </div>
+        {shop && (
+          <button
+            onClick={() => navigate("/shop/products")}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground hover:border-primary/40 transition-colors"
+            style={{ fontWeight: 600 }}
+          >
+            <Package size={15} />
+            Bidhaa zangu
+          </button>
+        )}
+        {profile && (
+          <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-border">
+            <div className="w-7 h-7 rounded-full bg-primary/20 flex items-center justify-center text-xs" style={{ fontWeight: 700, color: "var(--primary)" }}>
+              {profile.username?.[0]?.toUpperCase() ?? "U"}
             </div>
           </div>
-          <button
-            onClick={signOut}
-            className="w-full flex items-center gap-3 sm:justify-center px-3 py-2 rounded-xl text-sidebar-foreground/50 hover:bg-destructive/10 hover:text-destructive transition-colors text-xs"
-            style={{ fontWeight: 500 }}
-          >
-            Toka
-          </button>
-        </div>
-      </aside>
+        )}
+      </header>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="flex items-center gap-3 px-4 sm:px-6 py-4 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
-          <button
-            className="sm:hidden p-1.5 rounded-lg hover:bg-muted text-foreground transition-colors"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Menu size={20} />
-          </button>
-          <div className="flex-1">
-            <h1 className="text-foreground leading-none" style={{ fontWeight: 700 }}>
-              {activeNav === "pos" ? (shop ? shop.name : "Uuzaji wa Bidhaa")
-                : activeNav === "history" ? "Historia"
-                : activeNav === "reports" ? "Ripoti"
-                : "Mipango"}
-            </h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {activeNav === "pos" && shop ? `${shopProducts.length} bidhaa stookini`
-                : activeNav === "pos" ? "Mode ya majaribio"
-                : activeNav === "history" ? "Mauzo yaliyopita"
-                : activeNav === "reports" ? "Muhtasari wa mauzo"
-                : "Mipango ya akaunti"}
-            </p>
-          </div>
-          {shop && (
-            <button
-              onClick={() => navigate("/shop/products")}
-              className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-card border border-border text-sm text-foreground hover:border-primary/40 transition-colors"
-              style={{ fontWeight: 600 }}
-            >
-              <Package size={15} />
-              Bidhaa zangu
-            </button>
-          )}
-          <button
-            className="lg:hidden relative p-2.5 rounded-xl bg-primary text-primary-foreground"
-            onClick={() => setShowCheckout(cart.length > 0 ? true : false)}
-          >
-            <ShoppingCart size={18} />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent text-accent-foreground text-xs flex items-center justify-center" style={{ fontWeight: 700 }}>
-                {cartCount}
-              </span>
-            )}
-          </button>
-        </header>
-
-        <div className="flex-1 flex overflow-hidden">
+      {/* Content */}
+      <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col overflow-hidden">
           {activeNav === "pos" ? (
             <>
               <div className="flex-1 flex flex-col overflow-hidden px-4 sm:px-6 py-4 gap-4">
@@ -417,18 +344,17 @@ export default function POSPage() {
                       ))}
                     </div>
 
-                    <div className="flex-1 overflow-y-auto" style={{ scrollbarWidth: "none" }}>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 pb-4">
+                    <div className="flex-1 overflow-y-auto pb-4" style={{ scrollbarWidth: "none" }}>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {filtered.map((product) => (
-                          <button
+                          <div
                             key={product.id}
-                            onClick={() => addToCart(product)}
-                            className={`group text-left p-4 rounded-2xl bg-card border border-border hover:border-primary/50 hover:shadow-md active:scale-[0.97] transition-all ${product.stock === 0 ? "opacity-50" : ""}`}
+                            className={`group p-4 rounded-2xl bg-card border border-border transition-all relative ${product.stock === 0 ? "opacity-50" : "hover:border-primary/50 hover:shadow-md"}`}
                           >
                             {product.image_url ? (
                               <img src={product.image_url} alt="" className="w-12 h-12 mb-3 object-contain mx-auto" />
                             ) : (
-                              <div className="text-3xl mb-3 leading-none">{product.emoji}</div>
+                              <div className="text-3xl mb-3 leading-none text-center">{product.emoji}</div>
                             )}
                             <p className="text-sm text-foreground leading-snug mb-1 line-clamp-2" style={{ fontWeight: 600 }}>{product.name}</p>
                             <p className="text-primary" style={{ fontWeight: 700, fontSize: "0.8rem" }}>{formatTZS(product.price)}</p>
@@ -444,42 +370,31 @@ export default function POSPage() {
                                 )}
                               </div>
                             )}
-                          </button>
+                            {product.stock > 0 && shop && (
+                              <div className="flex gap-2 mt-2.5">
+                                <button
+                                  onClick={() => addToCart(product)}
+                                  className="flex-1 flex items-center justify-center gap-1 py-2 rounded-xl bg-primary/10 text-primary text-sm hover:bg-primary/20 active:scale-[0.97] transition-all"
+                                  style={{ fontWeight: 600 }}
+                                >
+                                  <Plus size={14} />
+                                  Ongeza
+                                </button>
+                                <button
+                                  onClick={() => sellDirect(product)}
+                                  className="flex-1 py-2 rounded-xl bg-primary text-primary-foreground text-sm hover:opacity-90 active:scale-[0.97] transition-all"
+                                  style={{ fontWeight: 600 }}
+                                >
+                                  Sell
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         ))}
                       </div>
                     </div>
                   </>
                 )}
-
-                {cart.length > 0 && (
-                  <div className="lg:hidden pb-2">
-                    <button
-                      onClick={() => setShowCheckout(true)}
-                      className="w-full py-4 rounded-2xl bg-primary text-primary-foreground flex items-center justify-between px-5 shadow-lg"
-                      style={{ fontWeight: 700 }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <ShoppingCart size={18} />
-                        <span>{cartCount} bidhaa</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span>{formatTZS(cartTotal)}</span>
-                        <ChevronRight size={18} />
-                      </div>
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              <div className="hidden lg:flex w-80 xl:w-96 flex-shrink-0 p-4">
-                <CartPanel
-                  items={cart}
-                  onIncrement={increment}
-                  onDecrement={decrement}
-                  onRemove={remove}
-                  onCheckout={() => setShowCheckout(true)}
-                  onClear={() => setCart([])}
-                />
               </div>
             </>
           ) : activeNav === "history" ? (
@@ -602,9 +517,14 @@ export default function POSPage() {
               <h2 className="text-foreground text-lg mb-4" style={{ fontWeight: 700 }}>Mipango</h2>
               <div className="max-w-md mx-auto space-y-4">
                 <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Jina la mtumiaji</p>
-                    <p className="text-foreground" style={{ fontWeight: 600 }}>{profile?.username ?? user?.email}</p>
+                  <div className="flex items-center gap-3 pb-3 border-b border-border">
+                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-lg" style={{ fontWeight: 700, color: "var(--primary)" }}>
+                      {profile?.username?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? "U"}
+                    </div>
+                    <div>
+                      <p className="text-foreground" style={{ fontWeight: 600 }}>{profile?.username ?? user?.email}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                    </div>
                   </div>
                   {shop && (
                     <div>
@@ -619,13 +539,24 @@ export default function POSPage() {
                     style={{ fontWeight: 600 }}
                   >
                     <Package size={16} />
-                    Bidhaa zangu
+                    Bidhaa zangu — Dhibiti stoo na bei
                   </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => navigate("/admin")}
+                      className="w-full flex items-center gap-2 px-4 py-3 rounded-xl bg-card border border-border text-foreground hover:border-primary/40 transition-colors text-sm"
+                      style={{ fontWeight: 600 }}
+                    >
+                      <Shield size={16} />
+                      Admin panel
+                    </button>
+                  )}
                   <button
                     onClick={signOut}
                     className="w-full flex items-center gap-2 px-4 py-3 rounded-xl bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors text-sm"
                     style={{ fontWeight: 600 }}
                   >
+                    <LogOut size={16} />
                     Toka
                   </button>
                 </div>
@@ -633,12 +564,76 @@ export default function POSPage() {
             </div>
           )}
         </div>
+
+        {/* Desktop cart sidebar */}
+        <div className="hidden lg:flex w-80 xl:w-96 flex-shrink-0 p-4 pb-[72px]">
+          <CartPanel
+            items={cart}
+            onIncrement={increment}
+            onDecrement={decrement}
+            onRemove={remove}
+            onCheckout={() => setShowCheckout(true)}
+            onClear={() => setCart([])}
+          />
+        </div>
       </div>
+
+      {/* Bottom Navigation */}
+      <nav className="flex-shrink-0 bg-card border-t border-border flex items-center justify-around px-2 py-1.5 safe-area-bottom z-40">
+        {NAV_ITEMS.map((item) => (
+          <button
+            key={item.id}
+            onClick={() => { setActiveNav(item.id); }}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors min-w-0 ${
+              activeNav === item.id
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <item.icon size={20} />
+            <span className="text-[10px] leading-none" style={{ fontWeight: activeNav === item.id ? 700 : 500 }}>{item.label}</span>
+          </button>
+        ))}
+        <button
+          onClick={() => { if (cart.length > 0) setShowCheckout(true); }}
+          className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-colors relative ${
+            cart.length > 0 ? "text-primary" : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <ShoppingCart size={20} />
+          {cartCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-primary-foreground text-[10px] rounded-full flex items-center justify-center" style={{ fontWeight: 700 }}>
+              {cartCount > 99 ? "99+" : cartCount}
+            </span>
+          )}
+          <span className="text-[10px] leading-none" style={{ fontWeight: cart.length > 0 ? 700 : 500 }}>Kikapu</span>
+        </button>
+      </nav>
+
+      {/* Mobile cart summary bar (when cart has items) */}
+      {activeNav === "pos" && cart.length > 0 && (
+        <div className="lg:hidden px-4 pb-2 bg-background">
+          <button
+            onClick={() => setShowCheckout(true)}
+            className="w-full py-3.5 rounded-2xl bg-primary text-primary-foreground flex items-center justify-between px-5 shadow-lg"
+            style={{ fontWeight: 700 }}
+          >
+            <div className="flex items-center gap-2">
+              <ShoppingCart size={18} />
+              <span>{cartCount} bidhaa</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>{formatTZS(cartTotal)}</span>
+              <ChevronRight size={18} />
+            </div>
+          </button>
+        </div>
+      )}
 
       {toast && (
         <div
           className={`
-            fixed bottom-6 left-1/2 -translate-x-1/2 z-50
+            fixed bottom-24 left-1/2 -translate-x-1/2 z-50
             flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg text-sm
             ${toast.type === "ok" ? "bg-foreground text-background" : "bg-destructive text-destructive-foreground"}
           `}

@@ -266,6 +266,69 @@ export async function deleteUserCascade(userId: string) {
   if (error) console.error("deleteUserCascade error:", error);
 }
 
+// --- Create product and add to shop in one step ---
+
+export async function createAndAddShopProduct(
+  shopId: string,
+  product: {
+    name: string;
+    emoji: string;
+    category: string;
+    image_url?: string;
+    stock: number;
+    buying_price: number;
+    selling_price: number;
+  }
+) {
+  const { data: user } = await supabase.auth.getUser();
+  if (!user.user) return null;
+
+  const { data: newProduct, error: productError } = await supabase
+    .from("products")
+    .insert({
+      name: product.name,
+      emoji: product.emoji,
+      category: product.category,
+      price: product.selling_price,
+      image_url: product.image_url || null,
+      created_by: user.user.id,
+    })
+    .select()
+    .single();
+
+  if (productError || !newProduct) return null;
+
+  const { data: shopProduct, error: shopError } = await supabase
+    .from("shop_products")
+    .insert({
+      shop_id: shopId,
+      product_id: newProduct.id,
+      price: product.selling_price,
+      selling_price: product.selling_price,
+      buying_price: product.buying_price,
+      stock: product.stock,
+    })
+    .select()
+    .single();
+
+  if (shopError) return null;
+  return shopProduct;
+}
+
+// --- Admin password reset ---
+
+export async function adminResetUserPassword(userId: string, newPassword: string) {
+  const { data, error } = await supabase.rpc("admin_reset_user_password", {
+    target_user_id: userId,
+    new_password: newPassword,
+  });
+  if (error) {
+    console.error("adminResetUserPassword error:", error);
+    return false;
+  }
+  return data;
+}
+
 // --- Images ---
 
 export async function uploadProductImage(file: File): Promise<string | null> {

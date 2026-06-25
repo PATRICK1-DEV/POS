@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import {
   LayoutDashboard, Users, Store, Package, ShoppingCart,
-  Shield, Loader2, Search, LogOut, Pencil, Trash2, X, Plus, Menu,
+  Shield, Loader2, Search, LogOut, Pencil, Trash2, X, Plus, Menu, KeyRound,
 } from "lucide-react";
 import { useAuth } from "../lib/auth-context";
 import {
@@ -18,6 +18,7 @@ import {
   createGlobalProduct,
   updateGlobalProduct,
   deleteGlobalProduct,
+  adminResetUserPassword,
 } from "../lib/db";
 
 type Tab = "overview" | "users" | "shops" | "products";
@@ -88,6 +89,12 @@ export default function AdminDashboardPage() {
   const [editingUser, setEditingUser] = useState<any | null>(null);
   const [userForm, setUserForm] = useState({ username: "", phone: "", email: "" });
 
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordTarget, setPasswordTarget] = useState<any | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [passwordStatus, setPasswordStatus] = useState("");
+
   function openCreate() {
     setEditing(null);
     setForm({ name: "", emoji: "📦", category: "General", image_url: "" });
@@ -150,6 +157,33 @@ export default function AdminDashboardPage() {
   async function handleDemoteAdmin(userId: string) {
     await updateUserRole(userId, "user");
     load();
+  }
+
+  function openPasswordReset(p: any) {
+    setPasswordTarget(p);
+    setNewPassword("");
+    setPasswordConfirm("");
+    setPasswordStatus("");
+    setShowPasswordModal(true);
+  }
+
+  async function handleResetPassword() {
+    if (!passwordTarget || !newPassword) return;
+    if (newPassword.length < 6) {
+      setPasswordStatus("Nywila lazima iwe angalau herufi 6");
+      return;
+    }
+    if (newPassword !== passwordConfirm) {
+      setPasswordStatus("Nywila hazilingani");
+      return;
+    }
+    const ok = await adminResetUserPassword(passwordTarget.user_id, newPassword);
+    if (ok) {
+      setPasswordStatus("✓ Nywila imebadilishwa");
+      setTimeout(() => { setShowPasswordModal(false); }, 1500);
+    } else {
+      setPasswordStatus("Hitilafu. Jaribu tena.");
+    }
   }
 
   if (loading) {
@@ -330,8 +364,11 @@ export default function AdminDashboardPage() {
                         </p>
                         <p className="text-xs text-muted-foreground">{p.email}</p>
                         {p.phone && <p className="text-xs text-muted-foreground">{p.phone}</p>}
+                        <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+                          Kuingia: "{p.username ?? p.email}" + nywila
+                        </p>
                       </div>
-                      <div className="text-right text-xs text-muted-foreground">
+                      <div className="text-right text-xs text-muted-foreground hidden sm:block">
                         <p>{new Date(p.created_at).toLocaleDateString("sw-TZ")}</p>
                       </div>
                       <div className="flex items-center gap-1">
@@ -344,6 +381,13 @@ export default function AdminDashboardPage() {
                             Ondoa Admin
                           </button>
                         )}
+                        <button
+                          onClick={() => openPasswordReset(p)}
+                          className="p-1.5 rounded-lg hover:bg-amber-100 text-muted-foreground hover:text-amber-600 transition-colors"
+                          title="Badilisha nywila"
+                        >
+                          <KeyRound size={15} />
+                        </button>
                         <button
                           onClick={() => openEditUser(p)}
                           className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
@@ -572,6 +616,61 @@ export default function AdminDashboardPage() {
                 style={{ fontWeight: 700 }}
               >
                 {editing ? "Hifadhi" : "Ongeza"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password reset modal */}
+      {showPasswordModal && passwordTarget && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-foreground/40 backdrop-blur-sm">
+          <div className="w-full sm:max-w-md bg-card rounded-t-3xl sm:rounded-2xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-5 border-b border-border">
+              <h2 className="text-foreground" style={{ fontWeight: 700 }}>
+                Badilisha nywila — {passwordTarget.username ?? passwordTarget.email}
+              </h2>
+              <button onClick={() => setShowPasswordModal(false)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <p className="text-xs text-muted-foreground">
+                Mtumiaji anaingia kwa kutumia jina lake "{passwordTarget.username ?? passwordTarget.email}" na nywila yake.
+                Hapa unaweza kuweka nywila mpya.
+              </p>
+              <div>
+                <label className="block text-sm text-foreground mb-1.5" style={{ fontWeight: 600 }}>Nywila mpya</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  placeholder="Angalau herufi 6"
+                  className="w-full px-4 py-2.5 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring text-foreground text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-foreground mb-1.5" style={{ fontWeight: 600 }}>Rudia nywila</label>
+                <input
+                  type="password"
+                  value={passwordConfirm}
+                  onChange={e => setPasswordConfirm(e.target.value)}
+                  placeholder="Andika nywila tena"
+                  className="w-full px-4 py-2.5 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring text-foreground text-sm"
+                />
+              </div>
+              {passwordStatus && (
+                <p className={`text-sm ${passwordStatus.startsWith("✓") ? "text-accent" : "text-destructive"}`} style={{ fontWeight: 600 }}>
+                  {passwordStatus}
+                </p>
+              )}
+              <button
+                onClick={handleResetPassword}
+                disabled={!newPassword || !passwordConfirm}
+                className="w-full py-3 rounded-xl bg-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ fontWeight: 700 }}
+              >
+                Badilisha nywila
               </button>
             </div>
           </div>
