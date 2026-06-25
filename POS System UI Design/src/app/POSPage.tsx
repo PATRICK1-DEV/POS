@@ -279,7 +279,7 @@ export default function POSPage() {
               : "Pakia bidhaa yako"}
           </p>
         </div>
-        <div className="relative" ref={menuRef}>
+        <div ref={menuRef}>
           <button
             onClick={() => setShowMenu(!showMenu)}
             className="p-2 rounded-xl hover:bg-muted text-foreground transition-colors"
@@ -287,7 +287,7 @@ export default function POSPage() {
             <EllipsisVertical size={20} />
           </button>
           {showMenu && (
-            <div className="absolute right-0 top-full mt-1 w-48 bg-card border border-border rounded-2xl shadow-xl z-50 py-2 overflow-hidden">
+            <div className="fixed right-4 top-16 sm:right-6 sm:top-[4.5rem] w-48 bg-card border border-border rounded-2xl shadow-xl z-[100] py-2 overflow-hidden">
               {profile && (
                 <div className="px-4 py-2 border-b border-border mb-1">
                   <p className="text-sm text-foreground truncate" style={{ fontWeight: 600 }}>{profile.username ?? user?.email}</p>
