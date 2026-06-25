@@ -32,35 +32,29 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-dvh min-h-screen flex items-center justify-center bg-white px-6 py-8 relative overflow-y-auto">
-      {/* Background decorative elements */}
+    <div className="min-h-dvh min-h-screen flex items-center justify-center bg-white px-5 py-4 relative overflow-hidden">
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[#FF7A00]/[0.03] blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-[#0F172A]/[0.02] blur-3xl" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-[#FF7A00]/[0.03] blur-3xl" />
       </div>
 
       <div className="w-full max-w-sm relative">
-        {/* Outer container with orange border */}
-        <div className="rounded-[24px] border-2 border-[#FF7A00]/20 bg-white shadow-xl shadow-black/5 p-8 md:p-10">
+        <div className="rounded-[20px] border-2 border-[#FF7A00]/20 bg-white shadow-xl shadow-black/5 px-6 py-6 md:px-8 md:py-7">
           {/* Logo */}
-          <div className="flex flex-col items-center gap-4 mb-8">
-            <div className="w-[72px] h-[72px] rounded-[20px] bg-white shadow-[0_8px_24px_rgba(255,122,0,0.15)] flex items-center justify-center p-3.5">
+          <div className="flex flex-col items-center gap-2 mb-5">
+            <div className="w-[60px] h-[60px] rounded-[16px] bg-white shadow-[0_6px_20px_rgba(255,122,0,0.12)] flex items-center justify-center p-3">
               <img src="/logo2.jpeg" alt="" className="w-full h-full object-contain" />
             </div>
-            <div className="text-center space-y-1">
-              <h1 className="text-[32px] leading-tight" style={{ fontWeight: 800, color: ODA_NAVY, letterSpacing: "-0.5px" }}>
+            <div className="text-center space-y-0">
+              <h1 className="text-[26px] leading-tight" style={{ fontWeight: 800, color: ODA_NAVY, letterSpacing: "-0.3px" }}>
                 MANGi APP
               </h1>
-              <p className="text-base" style={{ color: ODA_GRAY }}>
-                Point of Sale
-              </p>
+              <p className="text-sm" style={{ color: ODA_GRAY }}>Point of Sale</p>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Username / Email */}
-            <div className="space-y-1.5">
-              <label className="block text-sm" style={{ fontWeight: 600, color: ODA_NAVY }}>
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+            <div className="space-y-1">
+              <label className="block text-xs" style={{ fontWeight: 600, color: ODA_NAVY }}>
                 {lang === "sw" ? "Jina la mtumiaji au barua pepe" : "Username or email"}
               </label>
               <input
@@ -70,16 +64,9 @@ export default function LoginPage() {
                 placeholder={lang === "sw" ? "mfano123" : "e.g. john"}
                 required
                 style={{
-                  width: "100%",
-                  height: "56px",
-                  padding: "0 16px",
-                  borderRadius: "16px",
-                  backgroundColor: "#F8FAFC",
-                  border: `2px solid ${ODA_BORDER}`,
-                  color: ODA_NAVY,
-                  fontSize: "16px",
-                  outline: "none",
-                  transition: "border-color 0.2s",
+                  width: "100%", height: "48px", padding: "0 14px", borderRadius: "14px",
+                  backgroundColor: "#F8FAFC", border: `2px solid ${ODA_BORDER}`,
+                  color: ODA_NAVY, fontSize: "14px", outline: "none", transition: "border-color 0.2s",
                 }}
                 className="focus:!border-[#FF7A00] placeholder:text-[#94A3B8]"
                 onFocus={e => e.target.style.borderColor = ODA_ORANGE}
@@ -87,9 +74,8 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Password */}
-            <div className="space-y-1.5">
-              <label className="block text-sm" style={{ fontWeight: 600, color: ODA_NAVY }}>
+            <div className="space-y-1">
+              <label className="block text-xs" style={{ fontWeight: 600, color: ODA_NAVY }}>
                 {lang === "sw" ? "Nywila" : "Password"}
               </label>
               <div className="relative">
@@ -100,100 +86,67 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   required
                   style={{
-                    width: "100%",
-                    height: "56px",
-                    padding: "0 44px 0 16px",
-                    borderRadius: "16px",
-                    backgroundColor: "#F8FAFC",
-                    border: `2px solid ${ODA_BORDER}`,
-                    color: ODA_NAVY,
-                    fontSize: "16px",
-                    outline: "none",
-                    transition: "border-color 0.2s",
+                    width: "100%", height: "48px", padding: "0 40px 0 14px", borderRadius: "14px",
+                    backgroundColor: "#F8FAFC", border: `2px solid ${ODA_BORDER}`,
+                    color: ODA_NAVY, fontSize: "14px", outline: "none", transition: "border-color 0.2s",
                   }}
                   className="focus:!border-[#FF7A00] placeholder:text-[#94A3B8]"
                   onFocus={e => e.target.style.borderColor = ODA_ORANGE}
                   onBlur={e => e.target.style.borderColor = ODA_BORDER}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPw(!showPw)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2"
-                  style={{ color: ODA_GRAY }}
-                >
-                  {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                <button type="button" onClick={() => setShowPw(!showPw)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2" style={{ color: ODA_GRAY }}>
+                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
 
-            {/* Error */}
             {error && (
-              <div className="flex items-start gap-2.5 px-4 py-3.5 rounded-2xl bg-red-50 border border-red-100">
-                <AlertCircle size={16} className="mt-0.5 flex-shrink-0" style={{ color: "#EF4444" }} />
-                <span className="text-sm" style={{ color: "#DC2626" }}>{error}</span>
+              <div className="flex items-start gap-2 px-3.5 py-3 rounded-xl bg-red-50 border border-red-100">
+                <AlertCircle size={14} className="mt-0.5 flex-shrink-0" style={{ color: "#EF4444" }} />
+                <span className="text-xs" style={{ color: "#DC2626" }}>{error}</span>
               </div>
             )}
 
-            {/* Login Button */}
             <button
-              type="submit"
-              disabled={loading}
+              type="submit" disabled={loading}
               style={{
-                width: "100%",
-                height: "56px",
-                borderRadius: "16px",
+                width: "100%", height: "50px", borderRadius: "14px",
                 background: `linear-gradient(135deg, ${ODA_ORANGE} 0%, #E06600 100%)`,
-                color: "#FFFFFF",
-                fontSize: "16px",
-                fontWeight: 600,
-                boxShadow: `0 4px 16px rgba(255,122,0,0.25)`,
-                border: "none",
-                cursor: loading ? "not-allowed" : "pointer",
+                color: "#FFFFFF", fontSize: "15px", fontWeight: 600,
+                boxShadow: "0 4px 14px rgba(255,122,0,0.2)",
+                border: "none", cursor: loading ? "not-allowed" : "pointer",
                 opacity: loading ? 0.6 : 1,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
                 transition: "all 0.2s",
               }}
               onMouseEnter={e => { if (!loading) e.currentTarget.style.transform = "translateY(-1px)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
             >
-              {loading && <Loader2 size={18} className="animate-spin" />}
+              {loading && <Loader2 size={16} className="animate-spin" />}
               {lang === "sw" ? "Ingia" : "Sign In"}
             </button>
 
-            {/* Divider */}
-            <div className="flex items-center gap-3 py-1">
+            <div className="flex items-center gap-2">
               <div className="flex-1" style={{ height: "1px", backgroundColor: ODA_BORDER }} />
-              <span className="text-xs" style={{ color: ODA_GRAY }}>{lang === "sw" ? "au" : "or"}</span>
+              <span className="text-[11px]" style={{ color: ODA_GRAY }}>{lang === "sw" ? "au" : "or"}</span>
               <div className="flex-1" style={{ height: "1px", backgroundColor: ODA_BORDER }} />
             </div>
 
-            {/* Google Button */}
             <button
-              type="button"
-              onClick={signInWithGoogle}
+              type="button" onClick={signInWithGoogle}
               style={{
-                width: "100%",
-                height: "56px",
-                borderRadius: "16px",
-                backgroundColor: "#FFFFFF",
-                border: `2px solid ${ODA_BORDER}`,
-                color: ODA_NAVY,
-                fontSize: "16px",
-                fontWeight: 600,
+                width: "100%", height: "48px", borderRadius: "14px",
+                backgroundColor: "#FFFFFF", border: `2px solid ${ODA_BORDER}`,
+                color: ODA_NAVY, fontSize: "14px", fontWeight: 600,
                 cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "10px",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
                 transition: "all 0.2s",
               }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = ODA_ORANGE; e.currentTarget.style.backgroundColor = "#FFF8F0"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = ODA_BORDER; e.currentTarget.style.backgroundColor = "#FFFFFF"; }}
             >
-              <svg viewBox="0 0 24 24" width={20} height={20}>
+              <svg viewBox="0 0 24 24" width={18} height={18}>
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -202,22 +155,13 @@ export default function LoginPage() {
               {lang === "sw" ? "Ingia kwa Google" : "Continue with Google"}
             </button>
 
-            {/* Register link */}
-            <div className="text-center pt-1">
-              <Link
-                to="/register"
+            <div className="text-center pt-0.5">
+              <Link to="/register"
                 style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "48px",
-                  padding: "0 24px",
-                  borderRadius: "16px",
-                  border: `2px solid ${ODA_ORANGE}`,
-                  color: ODA_ORANGE,
-                  fontSize: "15px",
-                  fontWeight: 600,
-                  textDecoration: "none",
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  height: "42px", padding: "0 20px", borderRadius: "14px",
+                  border: `2px solid ${ODA_ORANGE}`, color: ODA_ORANGE,
+                  fontSize: "13px", fontWeight: 600, textDecoration: "none",
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={e => { e.currentTarget.style.backgroundColor = "#FFF8F0"; }}
@@ -229,21 +173,13 @@ export default function LoginPage() {
           </form>
         </div>
 
-        {/* Language toggle */}
-        <div className="flex justify-center mt-6">
-          <button
-            onClick={() => setLang(lang === "sw" ? "en" : "sw")}
+        <div className="flex justify-center mt-3">
+          <button onClick={() => setLang(lang === "sw" ? "en" : "sw")}
             style={{
-              padding: "6px 20px",
-              borderRadius: "20px",
-              backgroundColor: "#F8FAFC",
-              border: `1px solid ${ODA_BORDER}`,
-              color: ODA_GRAY,
-              fontSize: "13px",
-              fontWeight: 600,
-              cursor: "pointer",
-              transition: "all 0.2s",
-              letterSpacing: "1px",
+              padding: "4px 18px", borderRadius: "18px",
+              backgroundColor: "#F8FAFC", border: `1px solid ${ODA_BORDER}`,
+              color: ODA_GRAY, fontSize: "12px", fontWeight: 600,
+              cursor: "pointer", transition: "all 0.2s", letterSpacing: "1px",
             }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = ODA_ORANGE; e.currentTarget.style.color = ODA_ORANGE; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = ODA_BORDER; e.currentTarget.style.color = ODA_GRAY; }}
