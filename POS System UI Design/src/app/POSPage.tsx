@@ -257,7 +257,7 @@ export default function POSPage() {
   return (
     <div className="size-full flex flex-col bg-background overflow-hidden" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 sm:px-6 py-4 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0">
+      <header className="flex items-center gap-3 px-4 sm:px-6 py-4 border-b border-border bg-card/80 backdrop-blur-sm flex-shrink-0 relative z-10">
         <div className="flex items-center gap-2.5">
           <img src="/logo2.jpeg" alt="MANGi" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
           <div className="hidden sm:block">
@@ -327,7 +327,7 @@ export default function POSPage() {
       </header>
 
       {/* Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden pb-[68px]">
         <div className="flex-1 flex flex-col overflow-hidden">
           {activeNav === "pos" ? (
             <>
@@ -631,7 +631,7 @@ export default function POSPage() {
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="flex-shrink-0 bg-card border-t border-border flex items-center justify-around px-2 py-1.5 safe-area-bottom z-40">
+      <nav className="fixed bottom-0 left-0 right-0 bg-card border-t border-border flex items-center justify-around px-2 py-1.5 safe-area-bottom z-40">
         {NAV_ITEMS.map((item) => (
           <button
             key={item.id}
