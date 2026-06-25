@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import { Eye, EyeOff, AlertCircle, Loader2, User } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "../lib/auth-context";
+
+const ODA_ORANGE = "#FF7A00";
+const ODA_NAVY = "#0F172A";
+const ODA_GRAY = "#64748B";
+const ODA_BORDER = "#E5E7EB";
 
 export default function LoginPage() {
   const { signIn, signInWithGoogle } = useAuth();
@@ -11,6 +16,7 @@ export default function LoginPage() {
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [lang, setLang] = useState<"sw" | "en">("sw");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -26,111 +32,225 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-dvh min-h-screen flex items-center justify-center bg-background px-4 py-4 relative overflow-y-auto">
-      {/* Decorative background */}
+    <div className="min-h-dvh min-h-screen flex items-center justify-center bg-white px-6 py-8 relative overflow-y-auto">
+      {/* Background decorative elements */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute -top-20 -right-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-[#FF7A00]/[0.03] blur-3xl" />
+        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-[#0F172A]/[0.02] blur-3xl" />
       </div>
 
       <div className="w-full max-w-sm relative">
-        {/* Logo & Branding */}
-        <div className="flex flex-col items-center gap-3 mb-6">
-          <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/25 flex items-center justify-center p-2.5 md:p-3">
-            <img src="/logo2.jpeg" alt="" className="w-full h-full object-contain drop-shadow-sm" />
+        {/* Outer container with orange border */}
+        <div className="rounded-[24px] border-2 border-[#FF7A00]/20 bg-white shadow-xl shadow-black/5 p-8 md:p-10">
+          {/* Logo */}
+          <div className="flex flex-col items-center gap-4 mb-8">
+            <div className="w-[72px] h-[72px] rounded-[20px] bg-white shadow-[0_8px_24px_rgba(255,122,0,0.15)] flex items-center justify-center p-3.5">
+              <img src="/logo2.jpeg" alt="" className="w-full h-full object-contain" />
+            </div>
+            <div className="text-center space-y-1">
+              <h1 className="text-[32px] leading-tight" style={{ fontWeight: 800, color: ODA_NAVY, letterSpacing: "-0.5px" }}>
+                MANGi APP
+              </h1>
+              <p className="text-base" style={{ color: ODA_GRAY }}>
+                Point of Sale
+              </p>
+            </div>
           </div>
-          <div className="text-center">
-            <h1 className="text-foreground text-xl md:text-2xl tracking-tight" style={{ fontWeight: 800 }}>MANGi APP</h1>
-            <p className="text-muted-foreground text-xs md:text-sm mt-0.5">Point of Sale</p>
-          </div>
-        </div>
 
-        <form onSubmit={handleSubmit} className="bg-card border border-border/60 shadow-xl shadow-black/5 rounded-2xl p-4 md:p-6 space-y-4 md:space-y-5">
-          <div className="space-y-1.5">
-            <label className="block text-sm text-foreground" style={{ fontWeight: 600 }}>
-              Jina la mtumiaji au barua pepe
-            </label>
-            <div className="relative">
-              <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Username / Email */}
+            <div className="space-y-1.5">
+              <label className="block text-sm" style={{ fontWeight: 600, color: ODA_NAVY }}>
+                {lang === "sw" ? "Jina la mtumiaji au barua pepe" : "Username or email"}
+              </label>
               <input
                 type="text"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
-                placeholder="mfano123"
+                placeholder={lang === "sw" ? "mfano123" : "e.g. john"}
                 required
-                className="w-full pl-10 pr-4 py-2.5 md:py-3 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-primary/40 text-foreground placeholder:text-muted-foreground text-sm transition-all"
+                style={{
+                  width: "100%",
+                  height: "56px",
+                  padding: "0 16px",
+                  borderRadius: "16px",
+                  backgroundColor: "#F8FAFC",
+                  border: `2px solid ${ODA_BORDER}`,
+                  color: ODA_NAVY,
+                  fontSize: "16px",
+                  outline: "none",
+                  transition: "border-color 0.2s",
+                }}
+                className="focus:!border-[#FF7A00] placeholder:text-[#94A3B8]"
+                onFocus={e => e.target.style.borderColor = ODA_ORANGE}
+                onBlur={e => e.target.style.borderColor = ODA_BORDER}
               />
             </div>
-          </div>
 
-          <div className="space-y-1.5">
-            <label className="block text-sm text-foreground" style={{ fontWeight: 600 }}>
-              Nywila
-            </label>
-            <div className="relative">
-              <input
-                type={showPw ? "text" : "password"}
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="w-full px-4 py-2.5 md:py-3 rounded-xl bg-input-background border border-border focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-primary/40 text-foreground placeholder:text-muted-foreground text-sm pr-10 transition-all"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPw(!showPw)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            {/* Password */}
+            <div className="space-y-1.5">
+              <label className="block text-sm" style={{ fontWeight: 600, color: ODA_NAVY }}>
+                {lang === "sw" ? "Nywila" : "Password"}
+              </label>
+              <div className="relative">
+                <input
+                  type={showPw ? "text" : "password"}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  style={{
+                    width: "100%",
+                    height: "56px",
+                    padding: "0 44px 0 16px",
+                    borderRadius: "16px",
+                    backgroundColor: "#F8FAFC",
+                    border: `2px solid ${ODA_BORDER}`,
+                    color: ODA_NAVY,
+                    fontSize: "16px",
+                    outline: "none",
+                    transition: "border-color 0.2s",
+                  }}
+                  className="focus:!border-[#FF7A00] placeholder:text-[#94A3B8]"
+                  onFocus={e => e.target.style.borderColor = ODA_ORANGE}
+                  onBlur={e => e.target.style.borderColor = ODA_BORDER}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2"
+                  style={{ color: ODA_GRAY }}
+                >
+                  {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="flex items-start gap-2.5 px-4 py-3.5 rounded-2xl bg-red-50 border border-red-100">
+                <AlertCircle size={16} className="mt-0.5 flex-shrink-0" style={{ color: "#EF4444" }} />
+                <span className="text-sm" style={{ color: "#DC2626" }}>{error}</span>
+              </div>
+            )}
+
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: "100%",
+                height: "56px",
+                borderRadius: "16px",
+                background: `linear-gradient(135deg, ${ODA_ORANGE} 0%, #E06600 100%)`,
+                color: "#FFFFFF",
+                fontSize: "16px",
+                fontWeight: 600,
+                boxShadow: `0 4px 16px rgba(255,122,0,0.25)`,
+                border: "none",
+                cursor: loading ? "not-allowed" : "pointer",
+                opacity: loading ? 0.6 : 1,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={e => { if (!loading) e.currentTarget.style.transform = "translateY(-1px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              {loading && <Loader2 size={18} className="animate-spin" />}
+              {lang === "sw" ? "Ingia" : "Sign In"}
+            </button>
+
+            {/* Divider */}
+            <div className="flex items-center gap-3 py-1">
+              <div className="flex-1" style={{ height: "1px", backgroundColor: ODA_BORDER }} />
+              <span className="text-xs" style={{ color: ODA_GRAY }}>{lang === "sw" ? "au" : "or"}</span>
+              <div className="flex-1" style={{ height: "1px", backgroundColor: ODA_BORDER }} />
+            </div>
+
+            {/* Google Button */}
+            <button
+              type="button"
+              onClick={signInWithGoogle}
+              style={{
+                width: "100%",
+                height: "56px",
+                borderRadius: "16px",
+                backgroundColor: "#FFFFFF",
+                border: `2px solid ${ODA_BORDER}`,
+                color: ODA_NAVY,
+                fontSize: "16px",
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "10px",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = ODA_ORANGE; e.currentTarget.style.backgroundColor = "#FFF8F0"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = ODA_BORDER; e.currentTarget.style.backgroundColor = "#FFFFFF"; }}
+            >
+              <svg viewBox="0 0 24 24" width={20} height={20}>
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              {lang === "sw" ? "Ingia kwa Google" : "Continue with Google"}
+            </button>
+
+            {/* Register link */}
+            <div className="text-center pt-1">
+              <Link
+                to="/register"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "48px",
+                  padding: "0 24px",
+                  borderRadius: "16px",
+                  border: `2px solid ${ODA_ORANGE}`,
+                  color: ODA_ORANGE,
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.backgroundColor = "#FFF8F0"; }}
+                onMouseLeave={e => { e.currentTarget.style.backgroundColor = "transparent"; }}
               >
-                {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
-              </button>
+                {lang === "sw" ? "Sajili akaunti mpya" : "Register new account"}
+              </Link>
             </div>
-          </div>
+          </form>
+        </div>
 
-          {error && (
-            <div className="flex items-start gap-2 px-3.5 py-3 rounded-xl bg-destructive/10 text-destructive text-sm border border-destructive/20">
-              <AlertCircle size={15} className="mt-0.5 flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
+        {/* Language toggle */}
+        <div className="flex justify-center mt-6">
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-primary/25"
-            style={{ fontWeight: 700 }}
+            onClick={() => setLang(lang === "sw" ? "en" : "sw")}
+            style={{
+              padding: "6px 20px",
+              borderRadius: "20px",
+              backgroundColor: "#F8FAFC",
+              border: `1px solid ${ODA_BORDER}`,
+              color: ODA_GRAY,
+              fontSize: "13px",
+              fontWeight: 600,
+              cursor: "pointer",
+              transition: "all 0.2s",
+              letterSpacing: "1px",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = ODA_ORANGE; e.currentTarget.style.color = ODA_ORANGE; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = ODA_BORDER; e.currentTarget.style.color = ODA_GRAY; }}
           >
-            {loading && <Loader2 size={16} className="animate-spin" />}
-            Ingia
+            {lang === "sw" ? "SW" : "EN"}
           </button>
-
-          <div className="relative flex items-center gap-2 md:gap-3">
-            <div className="flex-1 border-t border-border" />
-            <span className="text-xs text-muted-foreground px-1">au</span>
-            <div className="flex-1 border-t border-border" />
-          </div>
-
-          <button
-            type="button"
-            onClick={signInWithGoogle}
-            className="w-full py-2.5 md:py-3 rounded-xl bg-card border border-border text-foreground hover:bg-muted/50 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5 text-sm"
-            style={{ fontWeight: 600 }}
-          >
-            <svg viewBox="0 0 24 24" width={18} height={18}>
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Ingia kwa Google
-          </button>
-
-          <p className="text-center text-sm text-muted-foreground">
-            Huna akaunti?{" "}
-            <Link to="/register" className="text-primary hover:text-primary/80 font-semibold transition-colors">
-              Sajili
-            </Link>
-          </p>
-        </form>
+        </div>
       </div>
     </div>
   );
